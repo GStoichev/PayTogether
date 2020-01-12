@@ -1,0 +1,36 @@
+{
+  "name": "JS",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/app.js",
+    "dev": "nodemon src/app.ts",
+    "build": "tsc -p ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GStoichev/JS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GStoichev/JS/issues"
+  },
+  "homepage": "https://github.com/GStoichev/JS#readme",
+  "dependencies": {
+    "@types/uuid": "^3.4.6",
+    "express": "^4.17.1",
+    "sqlite3": "^4.1.1",
+    "uuidv4": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.2",
+    "@types/node": "^13.1.6",
+    "@types/sqlite3": "^3.1.6",
+    "nodemon": "^2.0.2",
+    "ts-node": "^8.6.1",
+    "typescript": "^3.7.4"
+  }
+}
