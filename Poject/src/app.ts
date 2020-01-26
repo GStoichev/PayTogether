@@ -1,54 +1,46 @@
-import express, { Application, Response, Request, NextFunction, RequestHandler } from 'express';
-import uuid from 'uuid/v4';
-import sqlite from 'sqlite3';
+import express from 'express'
+import { Application } from 'express'
 
-let db = new sqlite.Database('testDatabase.db');
+class App {
+    public app: Application
+    public port: number
 
-// db.serialize(function () {
-//     db.run('CREATE TABLE users (id TEXT, name TEXT)')
-//     let id = uuid();
-//     var stmt = db.prepare('INSERT INTO users VALUES ("' + id.toString() + '","ivan")');
+    constructor(appInit: { port: number; middleWares: any; controllers: any; }) {
+        this.app = express();
+        this.port = appInit.port;
 
-//     stmt.run();
+        this.middlewares(appInit.middleWares);
+        this.routes(appInit.controllers);
+        this.assets();
+        this.template();
+    }
 
-//     stmt.finalize();
-// })
+    private middlewares(middleWares: { forEach: (arg0: (middleWare: any) => void) => void; }) {
+        middleWares.forEach(middleWare => {
+            this.app.use(middleWare);
+        })
+    }
 
-// db.close()
-////////////
-interface User {
-    id: string,
-    name: string,
+    private routes(controllers: { forEach: (arg0: (controller: any) => void) => void; }) {
+        controllers.forEach(controller => {
+            this.app.use('/', controller.router)
+        })
+    }
+
+    private assets() {
+        this.app.use(express.static('public'))
+        this.app.use(express.static('views'))
+    }
+
+    private template() {
+        this.app.set('view engine', 'pug');
+    }
+
+    public listen() {
+        this.app.listen(this.port, () => {
+            console.log(`App listening on the http://localhost:${this.port}`);
+        })
+    }
 }
-let user1: User = { id: uuid(), name: "test name 1" };
-let user2: User = { id: uuid(), name: "test name 2" };
-let user3: User = { id: uuid(), name: "test name 3" };
-let user4: User = { id: uuid(), name: "test name 4" };
 
-let users = [user1, user2, user3, user4]
-const app = express();
-
-app.get('/users', (req, res) => {
-    let promise = new Promise((resolve, reject) => {
-
-    })
-    db.all('SELECT * FROM users', function (err, rows) {
-        let testString = rows.map((row) => {return row.id + ': ' + row.name});
-    
-        res.send(JSON.parse(JSON.stringify(testString)));
-    });
-});
-
-app.get('/users/:id', (req, res) => {
-    let id = req.param('id');
-    let responseValue = "";
-    users.find((user: User) => {
-        if (user.id == id) {
-            responseValue += JSON.stringify(user);
-        }
-    });
-    res.send(JSON.parse(responseValue));
-});
-
-
-app.listen(8000, () => { console.log('Server is running') });
+export default App
