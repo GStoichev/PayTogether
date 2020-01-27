@@ -3,5 +3,5 @@ export interface IReposotory<T,K> {
     readById(id: K): Promise<T>;
     create(entry: T): Promise<T>;
     update(entry: T): Promise<T>;
-    delete(entry: T): Promise<T>; 
+    delete(entry: T): Promise<T>;
 }

@@ -1,7 +1,22 @@
 export class User {
 
-    constructor(private id_: string, private name_: string, private email_: string) {
-    
+    private id_: string = "";
+    private name_: string = "";
+    private email_: string = "";
+    private password_: string = "";
+
+    constructor(id?: string, name?: string, email?: string) {
+        if(id) {
+            this.id_ = id;
+        }
+
+        if(name) {
+            this.name_ = name;
+        }
+
+        if(email) {
+            this.email_ = email;
+        }   
     }
 
     get id(): string {
@@ -26,6 +41,14 @@ export class User {
 
     set email(email: string) {
         this.email_ = email;
+    }
+
+    get password(): string {
+        return this.password_;
+    }
+
+    set password(password: string) {
+        this.password_ = password;
     }
 
 }

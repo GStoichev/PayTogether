@@ -6,5 +6,6 @@ html(lang="en")
         meta(http-equiv="X-UA-Compatible", content="ie=edge")
         title Document
     body
-        each user, index in users
+        each user, index in usersToJson
+            h2()= user.name_
             //h2(onclick=`alert(${index})`)= user.name
