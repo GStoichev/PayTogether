@@ -5,6 +5,8 @@ import sqlite from 'sqlite3';
 import { resolve } from "dns";
 import { rejects } from "assert";
 import { getTableData, getTableDataById, insertInTable, deleteTableRow, updateRecordInTable } from "../../crudOperations";
+import { read } from "fs";
+import { isPrimitive } from "util";
 
 
 
@@ -117,7 +119,94 @@ export class UserRepository implements IReposotory<User,string> {
                 resolve(user);
             });
         });
-
     }
 
- }
+    public getAllFriends(id: string): Promise<Array<User>> {
+        let tableName = "friends";
+
+        let query = `SELECT * FROM ${tableName} WHERE my_id = "${id} OR other_id = "${id}""`;
+        return new Promise((resolve,rejects) => {
+        new Promise((resolve,rejects) => {
+            this.db.all(query, function (err, rows) {
+                if(rows === undefined) {
+                    rejects("You don't have friends");
+                    return;
+                }
+                let friendIds: Array<string> = rows.map((row) => {
+                    let otherId = row.other_id;
+                    let myId = row.my_id;
+                    if(myId == id)
+                    {
+                        return otherId;
+                    }
+
+                    return myId;
+                });
+
+                if(friendIds.length)
+                {
+                    resolve(friendIds);  
+                    return;
+                }
+                 rejects("You don't have friends");
+            }); 
+        }).then((friendIds) => {
+            let users: Array<User> = Array<User>();
+            for(let friendId of friendIds as string[])
+            {
+                this.readById(friendId).then((user) => {
+                    users.push(user);
+                });
+            }
+            resolve(users);
+        }).catch((err) => {
+            rejects(err);
+        }); 
+       
+        });
+         
+    }
+
+    public addFriend(id: string, other_id: string): Promise<User> {
+        let tableName = "friends";
+
+        return new Promise((resolve, reject) => {
+            this.readById(id).then((user) => {
+                console.log("first");
+                console.log(other_id);
+                this.readById(other_id).then((user) => {
+                    console.log("second");
+                    this.areWeFriends(id, other_id).then((areWeFriends) => {
+                        console.log("friends");
+                        if(areWeFriends) {
+                            reject("We are already friends");
+                            return;
+                        }
+                        
+                        insertInTable(tableName, ["my_id","other_id"],[,id,other_id],(err, row) => {
+                            console.log("insert");
+                            row === undefined ? reject("Not added properly") : resolve(user);
+                        });
+                    });
+                }).catch((err) => {
+                    reject(err);
+                });
+
+            }).catch((err) => {
+                reject(err);
+            });
+        });   
+    }
+
+    public areWeFriends(id: string, other_id: string): Promise<boolean> {
+        let tableName = `friends`;
+
+        let query = `SELECT * FROM ${tableName} WHERE my_id = ${id} AND other_id = ${other_id} OR my_id = ${other_id} AND other_id = ${id}`;
+        return new Promise((resolve, reject) => {
+            this.db.get(query,(err,row) => {
+                row === undefined ? resolve(false): resolve(true); 
+            });
+        });
+    }
+
+}

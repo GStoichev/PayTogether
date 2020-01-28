@@ -13,15 +13,15 @@ class UserController implements IControllerBase {
     }
 
     public initRoutes() {
-        this.router.get('/user', this.userProfile);
+        this.router.get(`${this.path}=:id`, this.userProfile);
     }
 
     userProfile = (req: Request, res: Response) => {
         let repo = new UserRepository();
-        repo.read().then((result) => {
-            console.log(result);
-            let usersToJson = JSON.parse(JSON.stringify(result));
-            res.render('user/user', {  usersToJson });
+        repo.readById(req.params.id).then((user) => {
+            res.render('user/user', { user: user , err: "" });
+        }).catch((err) => {
+            res.send({err: err});
         });
     }
 }

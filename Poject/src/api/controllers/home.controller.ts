@@ -1,6 +1,7 @@
 import * as express from 'express'
 import { Request, Response } from 'express'
 import IControllerBase from '../interfaces/IControllerBase.interface'
+import { UserRepository } from '../repositories/user.repository'
 import uuid = require('uuid')
 
 class HomeController implements IControllerBase {
@@ -12,13 +13,18 @@ class HomeController implements IControllerBase {
     }
 
     public initRoutes() {
-        this.router.get(this.path, this.index);
+        this.router.post(`${this.path}`, this.userProfile);
         //this.router.post('/register', this.register);
         //this.router.post(`/login`, this.login);
     }
 
-    index = (req: Request, res: Response) => {
-            res.render('home/home');
+    userProfile = (req: Request, res: Response) => {
+        let repo = new UserRepository();
+        repo.readById(req.body.id).then((result) => {
+            console.log(result);
+            let usersToJson = JSON.parse(JSON.stringify(result));
+            res.render('user/user', {  usersToJson });
+        });
     }
 
     // register = (req: Request, res: Response) => {
