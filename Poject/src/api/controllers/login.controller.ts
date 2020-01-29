@@ -45,7 +45,7 @@ class LoginController implements IControllerBase {
                 return;
             }
             userRepo.create(user).then((user) => {
-                entryRepo.create(4).then((entries) => {
+                entryRepo.read().then((entries) => {
                     console.log(JSON.stringify(entries));
                     res.render('home/home', {user: user, entries : entries});
                 });
