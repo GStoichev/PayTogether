@@ -4,10 +4,9 @@
     <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">  </script>
     <script>
       $(document).ready(function(){
-        var otherId = document.getElementById('otherId').value;
-        console.log(otherId);
         $("#addFriend").click(function(){
-          $.post("/friends/add",{id: "<%= userId%>", other_id: "9f92828a-7493-4f40-8c22-e7c778c0ce32"}, function(data){
+            var otherId = $("#otherId").val();
+          $.post("/friends/add",{id: "<%= userId%>", other_id: otherId}, function(data){
                 console.log(data);
           });
         });
@@ -17,7 +16,7 @@
 <body>
 <h1>Friends</h1>
 
-<input type="text" id="otherId"></input>
+<input type="text" id="otherId" name="otherId"></input>
 <button id="addFriend">add friend</button>
 
 <% friends.forEach(function(friend) { %>

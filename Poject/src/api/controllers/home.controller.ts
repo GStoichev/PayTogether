@@ -13,18 +13,13 @@ class HomeController implements IControllerBase {
     }
 
     public initRoutes() {
-        this.router.post(`${this.path}`, this.userProfile);
+        this.router.get(`${this.path}`, this.loadEntries);
         //this.router.post('/register', this.register);
         //this.router.post(`/login`, this.login);
     }
 
-    userProfile = (req: Request, res: Response) => {
-        let repo = new UserRepository();
-        repo.readById(req.body.id).then((result) => {
-            console.log(result);
-            let usersToJson = JSON.parse(JSON.stringify(result));
-            res.render('user/user', {  usersToJson });
-        });
+    loadEntries = (req: Request, res: Response) => {
+        console.log("heyy");
     }
 
     // register = (req: Request, res: Response) => {

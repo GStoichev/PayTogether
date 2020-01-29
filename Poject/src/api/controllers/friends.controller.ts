@@ -21,9 +21,10 @@ class FriendsController implements IControllerBase {
     showAllFriends = (req: Request, res: Response) => {
         let id = req.params.id;
         let userRepo = new UserRepository();
-
+        
         userRepo.getAllFriends(id).then((friends) => {
-            res.render('user/friends', {friends: friends, userId: id});
+            console.log(friends.length);
+            res.render('user/friends', {friends: friends, err: "" , userId: id});
         }).catch((err) => {
             res.render('user/friends', {friends: [], err: err, userId: id});
             //res.render("user/user", {err: err});
@@ -44,7 +45,6 @@ class FriendsController implements IControllerBase {
                 res.send();
             }
         }).catch((err) => {
-            console.log("sadasfa" + err);
             res.send(err);
         });
 

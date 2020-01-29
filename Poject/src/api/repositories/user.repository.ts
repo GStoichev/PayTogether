@@ -4,7 +4,7 @@ import uuid from 'uuid/v4';
 import sqlite from 'sqlite3';
 import { resolve } from "dns";
 import { rejects } from "assert";
-import { getTableData, getTableDataById, insertInTable, deleteTableRow, updateRecordInTable } from "../../crudOperations";
+import { getTableData, getTableDataById, insertInTable, deleteTableRow, updateRecordInTable, insertInTableNoResponse } from "../../crudOperations";
 import { read } from "fs";
 import { isPrimitive } from "util";
 
@@ -21,6 +21,9 @@ export class UserRepository implements IReposotory<User,string> {
     public read(): Promise<Array<User>> {
 
     return getTableData(`users`, function (err, rows) {
+        if(rows === undefined) {
+            return [];
+        }
             let users: Array<User> = rows.map((row) => {
                 let id = row.id;
                 let name = row.name;
@@ -36,6 +39,9 @@ export class UserRepository implements IReposotory<User,string> {
 
     public readById(id: string): Promise<User> {
         return getTableDataById(`users`,id, function(err, row) {
+                if(row === undefined) {
+                    return [];
+                }
                 let id = row.id;
                 let name = row.name;
                 let email = row.email;
@@ -124,7 +130,7 @@ export class UserRepository implements IReposotory<User,string> {
     public getAllFriends(id: string): Promise<Array<User>> {
         let tableName = "friends";
 
-        let query = `SELECT * FROM ${tableName} WHERE my_id = "${id} OR other_id = "${id}""`;
+        let query = `SELECT * FROM ${tableName} WHERE my_id = "${id}" OR other_id = "${id}"`;
         return new Promise((resolve,rejects) => {
         new Promise((resolve,rejects) => {
             this.db.all(query, function (err, rows) {
@@ -150,15 +156,24 @@ export class UserRepository implements IReposotory<User,string> {
                 }
                  rejects("You don't have friends");
             }); 
-        }).then((friendIds) => {
-            let users: Array<User> = Array<User>();
-            for(let friendId of friendIds as string[])
-            {
-                this.readById(friendId).then((user) => {
-                    users.push(user);
+        }).then((friendIds) => {          
+                let users: Array<User> = Array<User>();
+                let requests = (friendIds as string[]).reduce((promiseChain, friendId) => {
+                    return promiseChain.then(() => new Promise((resolve) => {
+                        this.readById(friendId).then((user) => {
+                            users.push(user);
+                            resolve();
+                        }).catch((err) => {
+                            rejects(err);
+                        });
+                    }));
+                }, Promise.resolve());
+
+                requests.then(() => {
+                    resolve(users);
+                }).catch((err) => {
+                    rejects(err);
                 });
-            }
-            resolve(users);
         }).catch((err) => {
             rejects(err);
         }); 
@@ -169,23 +184,23 @@ export class UserRepository implements IReposotory<User,string> {
 
     public addFriend(id: string, other_id: string): Promise<User> {
         let tableName = "friends";
-
         return new Promise((resolve, reject) => {
             this.readById(id).then((user) => {
-                console.log("first");
-                console.log(other_id);
                 this.readById(other_id).then((user) => {
-                    console.log("second");
                     this.areWeFriends(id, other_id).then((areWeFriends) => {
-                        console.log("friends");
                         if(areWeFriends) {
                             reject("We are already friends");
                             return;
                         }
-                        
-                        insertInTable(tableName, ["my_id","other_id"],[,id,other_id],(err, row) => {
-                            console.log("insert");
-                            row === undefined ? reject("Not added properly") : resolve(user);
+                        insertInTableNoResponse(tableName, ["my_id","other_id"],[,id,other_id],(err) => {
+                            if(err)
+                            {
+                                reject(err);
+                                return
+                            }
+                            resolve(user);
+                        }).catch((err: any) => {
+                            reject(err);
                         });
                     });
                 }).catch((err) => {
@@ -201,9 +216,14 @@ export class UserRepository implements IReposotory<User,string> {
     public areWeFriends(id: string, other_id: string): Promise<boolean> {
         let tableName = `friends`;
 
-        let query = `SELECT * FROM ${tableName} WHERE my_id = ${id} AND other_id = ${other_id} OR my_id = ${other_id} AND other_id = ${id}`;
+        let query = `SELECT * FROM ${tableName} WHERE (my_id = "${id}" AND other_id = "${other_id}") OR (my_id = "${other_id}" AND other_id = "${id}")`;
         return new Promise((resolve, reject) => {
             this.db.get(query,(err,row) => {
+                if(err)
+                {
+                    reject(err);
+                    return;
+                }
                 row === undefined ? resolve(false): resolve(true); 
             });
         });

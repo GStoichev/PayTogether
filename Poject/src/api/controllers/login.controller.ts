@@ -4,6 +4,8 @@ import IControllerBase from '../interfaces/IControllerBase.interface';
 import { User } from '../models/user.model';
 import uuid from 'uuid/v4';
 import { UserRepository } from '../repositories/user.repository';
+import { EntryRepository } from '../repositories/entry.repository';
+import { Entry } from '../models/entry.model';
 
 class LoginController implements IControllerBase {
     public path = '/';
@@ -29,9 +31,12 @@ class LoginController implements IControllerBase {
         let email = req.body.email;
 
         let userRepo = new UserRepository();
+        let entryRepo = new EntryRepository();
 
         let user = new User(uuid(),name,email);
         user.password = password;
+
+        let entry = new Entry(1,)
 
         userRepo.isExisting(name).then((isExisting) => {
             if(isExisting)
@@ -40,7 +45,10 @@ class LoginController implements IControllerBase {
                 return;
             }
             userRepo.create(user).then((user) => {
-                res.render('home/home',{user: user});
+                entryRepo.create(4).then((entries) => {
+                    console.log(JSON.stringify(entries));
+                    res.render('home/home', {user: user, entries : entries});
+                });
             });
         });
     }
@@ -50,9 +58,13 @@ class LoginController implements IControllerBase {
         let password = req.body.password;
 
         let userRepo = new UserRepository();
+        let entryRepo = new EntryRepository();
 
         userRepo.login(name,password).then((user) => {
-            res.render('home/home',{user: user});
+            entryRepo.read().then((entries) => {
+                console.log(JSON.stringify(entries));
+                res.render('home/home', {user: user, entries : entries});
+            });
         }).catch((err) => {
             res.render('login/index', {err: err});
         });     
