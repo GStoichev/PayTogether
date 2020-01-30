@@ -7,21 +7,15 @@
     <form action="/user=<%=user.id%>" method="GET">
         <button>Open my profile</button>
     </form>
- 
+
+    <button>create new entry</button>
+
     <% entries.forEach(function(entry) { %>
         <%= entry.name %> <br>
         <%= entry.desc %> <br>
-         <!-- <% entry.participants.forEach(function(participant) { %>
-            <%= participant.name %> 
-            <br>
-             <input><input>
-            <button> Pay </button>
-            <br>
-        <% }); %>  -->
-        <%= entry.data %> <br>
+        <%= entry.date %> <br>
         <br>
-    <% }); %> 
-
+    <% }); %>
 
 </body>
 </html>

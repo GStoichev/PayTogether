@@ -62,7 +62,7 @@ export function insertInTable(tableName: string, columNames: any[], columValues:
     });
 }
 
-export function insertInTableNoResponse(tableName: string, columNames: any[], columValues: any[], callback: (err:any) => any): any {
+export function insertInTableWithAutoIncrement(tableName: string, columNames: any[], columValues: any[], callback: (err:any, row:any) => any): any {
 
     let columNamesAsString = columNames.reduce((previousValue,currentValue,currentIndex) => {
         return previousValue ? previousValue +  ", " + currentValue : currentValue;
@@ -84,13 +84,26 @@ export function insertInTableNoResponse(tableName: string, columNames: any[], co
     },"");
 
     return new Promise((resolve, reject) => {
+        console.log("Start inserting");
         let query = `INSERT INTO ${tableName} (${columNamesAsString}) VALUES(${valuesAsString})`;
         db.run(query,(err) => {
             if(err)
             {
                 reject(err);
             } else {
-                resolve(callback(err));
+                let selectQuery = `SELECT * FROM ${tableName} WHERE id=(SELECT max(id) FROM ${tableName})`;
+                db.get(selectQuery,(err,row) => {
+                    if(err) {
+                        reject(err);
+                        return;
+                    }
+                    if(row === undefined) {
+                        reject("row is empty")
+                        return;
+                    }
+                    console.log("hey2");
+                    resolve(callback(err,row));
+                });
             }
         });
 
@@ -98,13 +111,13 @@ export function insertInTableNoResponse(tableName: string, columNames: any[], co
     });
 }
 
-export function deleteTableRow(tableName: string, id: string, callback :(err: any) => any): any {
-    return new Promise((resolve, rejects) => {
+export function deleteTableRow(tableName: string, id: any, callback :(err: any) => any): any {
+    return new Promise((resolve, reject) => {
         let query = `DELETE FROM ${tableName} WHERE id="${id}"`;
         db.run(query,(err) =>{
             if(err)
             {
-                console.log(err);
+                reject(err);
             } else{
                 resolve(callback(err));
             }
@@ -112,8 +125,7 @@ export function deleteTableRow(tableName: string, id: string, callback :(err: an
     });
 }
 
-export function updateRecordInTable(tableName: string, id: string, columNames: any[], columValues: any[], callback :(err: any, row: any) => any): any {
-    
+export function updateRecordInTable(tableName: string, id: any, columNames: any[], columValues: any[], callback :(err: any, row: any) => any): any {
     let modifiedColumValues = columValues.map((value) => {
         let modifiedCurrentValue = "";
         if(typeof value === "string") {
@@ -138,14 +150,14 @@ export function updateRecordInTable(tableName: string, id: string, columNames: a
     },"");
     
 
-    return new Promise((resolve, rejects) => {
+    return new Promise((resolve, reject) => {
         let query = `UPDATE ${tableName} SET ${valuesAsString} WHERE id="${id}"`;
         db.run(query,(err) =>{
             if(err)
             {
-                console.log(err);
+                reject(err);
                 return;
-            }else{
+            } else {
                 getTableDataById(tableName, id , function(err, row) {
                     resolve(callback(err,row));
                 });

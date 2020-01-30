@@ -36,7 +36,11 @@ class LoginController implements IControllerBase {
         let user = new User(uuid(),name,email);
         user.password = password;
 
-        let entry = new Entry(1,)
+        let entry = new Entry();
+
+        entry.name = "testNameEntry";
+        entry.desc = "testDescEntry";
+        entry.date = new Date();
 
         userRepo.isExisting(name).then((isExisting) => {
             if(isExisting)
@@ -45,8 +49,9 @@ class LoginController implements IControllerBase {
                 return;
             }
             userRepo.create(user).then((user) => {
-                entryRepo.read().then((entries) => {
-                    console.log(JSON.stringify(entries));
+                entryRepo.create(entry).then((entry) => {
+                    console.log(JSON.stringify(entry));
+                    let entries: Entry[] = [entry];
                     res.render('home/home', {user: user, entries : entries});
                 });
             });
@@ -62,8 +67,11 @@ class LoginController implements IControllerBase {
 
         userRepo.login(name,password).then((user) => {
             entryRepo.read().then((entries) => {
-                console.log(JSON.stringify(entries));
-                res.render('home/home', {user: user, entries : entries});
+                console.log(entries[0].id);
+                entryRepo.getParticipants(entries[0]).then((participants) => {
+                    console.log(JSON.stringify(participants));
+                    res.render('home/home', {entries : entries, user: user });
+                });
             });
         }).catch((err) => {
             res.render('login/index', {err: err});

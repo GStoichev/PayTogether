@@ -1,3 +1,9 @@
+export interface Participant {
+    fr_1_id: string,
+    fr_2_id: string,
+    money: number
+}
+
 export class Entry {
 
     private id_: number = 0;

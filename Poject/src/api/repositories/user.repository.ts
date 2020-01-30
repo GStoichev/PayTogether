@@ -4,7 +4,7 @@ import uuid from 'uuid/v4';
 import sqlite from 'sqlite3';
 import { resolve } from "dns";
 import { rejects } from "assert";
-import { getTableData, getTableDataById, insertInTable, deleteTableRow, updateRecordInTable, insertInTableNoResponse } from "../../crudOperations";
+import { getTableData, getTableDataById, insertInTable, deleteTableRow, updateRecordInTable, insertInTableWithAutoIncrement } from "../../crudOperations";
 import { read } from "fs";
 import { isPrimitive } from "util";
 
@@ -192,7 +192,7 @@ export class UserRepository implements IReposotory<User,string> {
                             reject("We are already friends");
                             return;
                         }
-                        insertInTableNoResponse(tableName, ["my_id","other_id"],[,id,other_id],(err) => {
+                        insertInTableWithAutoIncrement(tableName, ["my_id","other_id"],[,id,other_id],(err) => {
                             if(err)
                             {
                                 reject(err);
