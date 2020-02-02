@@ -84,7 +84,6 @@ export function insertInTableWithAutoIncrement(tableName: string, columNames: an
     },"");
 
     return new Promise((resolve, reject) => {
-        console.log("Start inserting");
         let query = `INSERT INTO ${tableName} (${columNamesAsString}) VALUES(${valuesAsString})`;
         db.run(query,(err) => {
             if(err)

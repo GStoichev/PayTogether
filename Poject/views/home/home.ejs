@@ -8,12 +8,30 @@
         <button>Open my profile</button>
     </form>
 
-    <button>create new entry</button>
+    <form action="/home" method="POST">
+        <button>create new entity</button>
+    </form>
+    <br>
 
-    <% entries.forEach(function(entry) { %>
-        <%= entry.name %> <br>
-        <%= entry.desc %> <br>
-        <%= entry.date %> <br>
+    <% entitiesWithParticipants.forEach(function(entityWithParticipants) { %>
+        <%= entityWithParticipants.entity.name %> <br>
+        <%= entityWithParticipants.entity.desc %> <br>
+
+        <% entityWithParticipants.participants.forEach(function(participant) { %>
+            <%= participant.myName %>
+            <% if(participant.income){ %>
+                <b> income</b>
+              <% } else{ %>  
+                <b> expense</b>
+             <% } %>
+            <%= participant.otherName %>
+            <%= participant.money %> 
+            <input></input>
+            <button> Pay </button> 
+            <br>
+        <% }); %>
+
+        <%= entityWithParticipants.entity.date %> <br>
         <br>
     <% }); %>
 

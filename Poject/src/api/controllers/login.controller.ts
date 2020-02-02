@@ -4,8 +4,9 @@ import IControllerBase from '../interfaces/IControllerBase.interface';
 import { User } from '../models/user.model';
 import uuid from 'uuid/v4';
 import { UserRepository } from '../repositories/user.repository';
-import { EntryRepository } from '../repositories/entry.repository';
-import { Entry } from '../models/entry.model';
+import { EntityRepository } from '../repositories/entity.repository';
+import { Entity, ParticipantsForPreview, EntityForPreview} from '../models/entity.model';
+import { rejects } from 'assert';
 
 class LoginController implements IControllerBase {
     public path = '/';
@@ -31,16 +32,16 @@ class LoginController implements IControllerBase {
         let email = req.body.email;
 
         let userRepo = new UserRepository();
-        let entryRepo = new EntryRepository();
+        let entityRepo = new EntityRepository();
 
         let user = new User(uuid(),name,email);
         user.password = password;
 
-        let entry = new Entry();
+        let entity = new Entity();
 
-        entry.name = "testNameEntry";
-        entry.desc = "testDescEntry";
-        entry.date = new Date();
+        entity.name = "testNameEntity";
+        entity.desc = "testDescEntity";
+        entity.date = new Date();
 
         userRepo.isExisting(name).then((isExisting) => {
             if(isExisting)
@@ -49,10 +50,10 @@ class LoginController implements IControllerBase {
                 return;
             }
             userRepo.create(user).then((user) => {
-                entryRepo.create(entry).then((entry) => {
-                    console.log(JSON.stringify(entry));
-                    let entries: Entry[] = [entry];
-                    res.render('home/home', {user: user, entries : entries});
+                entityRepo.create(entity).then((entity) => {
+                    console.log(JSON.stringify(entity));
+                    let entities: Entity[] = [entity];
+                    res.render('home/home', {user: user, entities : entities});
                 });
             });
         });
@@ -63,15 +64,63 @@ class LoginController implements IControllerBase {
         let password = req.body.password;
 
         let userRepo = new UserRepository();
-        let entryRepo = new EntryRepository();
+        let entityRepo = new EntityRepository();
 
         userRepo.login(name,password).then((user) => {
-            entryRepo.read().then((entries) => {
-                console.log(entries[0].id);
-                entryRepo.getParticipants(entries[0]).then((participants) => {
-                    console.log(JSON.stringify(participants));
-                    res.render('home/home', {entries : entries, user: user });
+            entityRepo.readEntitiesWithParticipants().then((entitiesWithParticipants) => {
+                console.log(JSON.stringify(entitiesWithParticipants));
+                let entitiesMyData: EntityForPreview[] = [];
+
+                let resultEntitiesWithParticipants = entitiesWithParticipants.reduce((promiseChain, entityWithParticipants) => {
+                    return promiseChain.then(() => new Promise((resolve) => {
+                        let shouldAddEntity = true;
+                        let participants = entityWithParticipants.participants.reduce((participantPromiseChain, participant) => {
+                            return participantPromiseChain.then(() => new Promise((resolve) => { 
+                                if((participant.fr_1_id == user.id) || (participant.fr_2_id == user.id)) {
+                                    if(shouldAddEntity) {
+                                        let newEntityWithParticipants: EntityForPreview = {
+                                            entity: entityWithParticipants.entity,
+                                            participants: []
+                                        }
+                                        entitiesMyData.push(newEntityWithParticipants);
+                                        shouldAddEntity = false;
+                                    }
+        
+                                    let income = true;
+                                    let otherId = participant.fr_1_id;
+                                    if(participant.fr_1_id == user.id) {
+                                        income = false;
+                                        otherId = participant.fr_2_id;
+                                    }
+                                    
+                                    userRepo.readById(otherId).then((otherUser) => {
+                                        let participantForPreview: ParticipantsForPreview = {
+                                            myName: user.name,
+                                            otherName: otherUser.name,
+                                            money: participant.money,
+                                            income: income
+                                        }
+                                        entitiesMyData[entitiesMyData.length - 1].participants.push(participantForPreview);
+                                        resolve();
+                                    });
+                                }
+                            }));
+                        },Promise.resolve()); 
+                        participants.then(() => {
+                            resolve();
+                        });
+                   })); 
+               }, Promise.resolve());
+
+               resultEntitiesWithParticipants.then(() => {
+                    console.log();
+                    console.log(JSON.stringify(entitiesMyData));
+                    res.render('home/home', {user: user, entitiesWithParticipants: entitiesMyData, err: ""});
+                }).catch((err) => {
+                    res.render('home/home', { user: user, err: err});    
                 });
+            }).catch((err) => {
+                res.render('home/home', { user: user, err: err});    
             });
         }).catch((err) => {
             res.render('login/index', {err: err});

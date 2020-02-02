@@ -4,7 +4,24 @@ export interface Participant {
     money: number
 }
 
-export class Entry {
+export interface ParticipantsForPreview {
+    myName: string,
+    otherName: string,
+    money: number,
+    income: boolean
+}
+
+export interface EntityWithParticipants {
+    entity: Entity,
+    participants: Array<Participant>
+}
+
+export interface EntityForPreview {
+    entity: Entity,
+    participants: Array<ParticipantsForPreview>
+}
+
+export class Entity {
 
     private id_: number = 0;
     private name_: string = "";
