@@ -229,4 +229,20 @@ export class UserRepository implements IReposotory<User,string> {
         });
     }
 
+    public getFriendshipID(id: string, other_id: string): Promise<number> {
+        let tableName = `friends`;
+
+        let query = `SELECT * FROM ${tableName} WHERE (my_id = "${id}" AND other_id = "${other_id}") OR (my_id = "${other_id}" AND other_id = "${id}")`;
+        return new Promise((resolve, reject) => {
+            this.db.get(query,(err,row) => {
+                if(err)
+                {
+                    reject(err);
+                    return;
+                }
+                
+                row === undefined ? reject("users are not friends") : resolve(row.id); 
+            });
+        });
+    }
 }

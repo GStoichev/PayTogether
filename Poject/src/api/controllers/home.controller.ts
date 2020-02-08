@@ -5,6 +5,7 @@ import { UserRepository } from '../repositories/user.repository'
 import { EntityRepository } from '../repositories/entity.repository'
 import uuid = require('uuid')
 import { Entity, Participant } from '../models/entity.model'
+import { rejects } from 'assert'
 
 class HomeController implements IControllerBase {
     public path = '/home';
@@ -34,27 +35,54 @@ class HomeController implements IControllerBase {
         entity.desc = "testDescEntity";
         entity.date = new Date();
 
-        let participants: Participant[] = [];
+        let frs : Participant[] = [];
 
-        // let participant1: Participant = {
-        //     fr_1_id: "",
-        //     fr_2_id: "",
-        //     money: 15
-        // }
+        let fr1 : Participant = {
+            fr_1_id: "0a4fc957-a62a-47e3-8077-ab6255e1c21b",
+            fr_2_id: "59f1ce52-322e-4df1-aaaf-f16758d35ff4",
+            money: 10
+        }
 
-        // let participant2: Participant = {
-        //     fr_1_id: "",
-        //     fr_2_id: "",
-        //     money: 12
-        // }
+        let fr2 : Participant = {
+            fr_1_id: "59f1ce52-322e-4df1-aaaf-f16758d35ff4",
+            fr_2_id: "9f92828a-7493-4f40-8c22-e7c778c0ce32",
+            money: 12
+        }
 
-        // participants.push(participant1);
-        // participants.push(participant2);
-
-        entityRepo.createEntityWithParticipants(entity,participants);
-
+        frs.push(fr1);
+        frs.push(fr2);
+        
+        let results = frs.reduce((promiseChain, fr) => {
+            return promiseChain.then(() => new Promise((resolve,reject) => {
+                userRepo.areWeFriends(fr.fr_1_id, fr.fr_2_id).then((areWeFriends) => {
+                    if(!areWeFriends)
+                    {
+                        reject("We are not friends");
+                    }
+                    resolve();
+                }).catch((err) => {
+                    reject(err);
+                });
+            }));
+        }, Promise.resolve());
+        
+        results.then(() => {
+            entityRepo.createEntityWithParticipants(entity, frs).then(() => {
+                res.send();
+            }).catch((err) => {
+                console.log(err);
+            });
+        }).catch((err) => {
+            console.log(`${err} | entity not created properly`);
+        });
     }
 
+    pay = (req: Request, res: Response) => {
+        //user
+        //value_money
+        //entity
+        //
+    }
     // register = (req: Request, res: Response) => {
     //     res.render('home/home',{test: "register"});
     // }

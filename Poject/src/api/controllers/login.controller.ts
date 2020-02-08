@@ -51,7 +51,6 @@ class LoginController implements IControllerBase {
             }
             userRepo.create(user).then((user) => {
                 entityRepo.create(entity).then((entity) => {
-                    console.log(JSON.stringify(entity));
                     let entities: Entity[] = [entity];
                     res.render('home/home', {user: user, entities : entities});
                 });
@@ -68,7 +67,7 @@ class LoginController implements IControllerBase {
 
         userRepo.login(name,password).then((user) => {
             entityRepo.readEntitiesWithParticipants().then((entitiesWithParticipants) => {
-                console.log(JSON.stringify(entitiesWithParticipants));
+                
                 let entitiesMyData: EntityForPreview[] = [];
 
                 let resultEntitiesWithParticipants = entitiesWithParticipants.reduce((promiseChain, entityWithParticipants) => {
@@ -85,7 +84,7 @@ class LoginController implements IControllerBase {
                                         entitiesMyData.push(newEntityWithParticipants);
                                         shouldAddEntity = false;
                                     }
-        
+                                    
                                     let income = true;
                                     let otherId = participant.fr_1_id;
                                     if(participant.fr_1_id == user.id) {
@@ -113,8 +112,6 @@ class LoginController implements IControllerBase {
                }, Promise.resolve());
 
                resultEntitiesWithParticipants.then(() => {
-                    console.log();
-                    console.log(JSON.stringify(entitiesMyData));
                     res.render('home/home', {user: user, entitiesWithParticipants: entitiesMyData, err: ""});
                 }).catch((err) => {
                     res.render('home/home', { user: user, err: err});    
