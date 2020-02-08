@@ -1,8 +1,10 @@
 import sqlite from 'sqlite3';
 import uuid from 'uuid/v4';
 import { rejects } from 'assert';
+import { resolve } from 'dns';
+import { response } from 'express';
 
-let db = new sqlite.Database('testDatabase.db');
+let db = new sqlite.Database('payTogether.db');
 
 export function getTableData(tableName: string, callback: (err: any, rows: any[]) => any): any {
     return new Promise((resolve,rejects) => {    
@@ -12,7 +14,7 @@ export function getTableData(tableName: string, callback: (err: any, rows: any[]
         });   
 }
 
-export function getTableDataById(tableName: string, id: string, callback: (err: any, row: any) => any): any {
+export function getTableDataById(tableName: string, id: any, callback: (err: any, row: any) => any): any {
             return new Promise((resolve, reject) => {
                 let query = `SELECT * FROM ${tableName} WHERE id ="${id}"`;
                 db.get(query, function (err, row) {
@@ -21,7 +23,7 @@ export function getTableDataById(tableName: string, id: string, callback: (err: 
             });
 }
 
-export function insertInTable(tableName: string, columNames: any[], columValues: any[], callback: (err:any, row: any) => any) {
+export function insertInTable(tableName: string, columNames: any[], columValues: any[], callback: (err:any, row: any) => any): any {
 
     let columNamesAsString = columNames.reduce((previousValue,currentValue,currentIndex) => {
         return previousValue ? previousValue +  ", " + currentValue : currentValue;
@@ -53,12 +55,6 @@ export function insertInTable(tableName: string, columNames: any[], columValues:
                 getTableDataById(tableName,columNames[0], function(err, row) {
                     resolve(callback(err,row));
                 });
-                
-                
-                //db.get(`SELECT * FROM ${tableName} WHERE id ="${columValues[0]}"`,(err,row) => {
-                //    resolve(callback(err,row));
-                //});
-                
             }
         });
 
@@ -66,80 +62,105 @@ export function insertInTable(tableName: string, columNames: any[], columValues:
     });
 }
 
-    // private postRequest() {
-    //     //insert users
-    //     app.post('/table=:tableName', function(req, res) {
-    //     let tableName = req.param('tableName');
-    //     let name = req.body.name;
+export function insertInTableWithAutoIncrement(tableName: string, columNames: any[], columValues: any[], callback: (err:any, row:any) => any): any {
 
-    //     //find a way to fix that
-    //     //columes shoudn't be hardcoded
-    //     let query = `INSERT INTO ${tableName} (id,name) VALUES("${uuid()}","${name}")`;
+    let columNamesAsString = columNames.reduce((previousValue,currentValue,currentIndex) => {
+        return previousValue ? previousValue +  ", " + currentValue : currentValue;
+    });
 
-    //     db.run(query,(err) => {
-    //         if(err)
-    //         {
-    //             console.log(err);
-    //         } else {
-    //             console.log(`data inserted in table ${tableName}`);
-    //         }
-    //     });
-    //     res.sendStatus(200)});
-    // } 
+    let valuesAsString = columValues.reduce((previousValue,currentValue,currentIndex) => {
+        let modifiedCurrentValue = "";
+        if(typeof currentValue === "string") {
+            modifiedCurrentValue = `\"` + currentValue + `\"`;
+        } else if(typeof currentValue === "number") {
+            modifiedCurrentValue = currentValue.toString();
+        } else if (typeof currentValue === "boolean") {
+            modifiedCurrentValue = currentValue.toString();
+        } else {
+            console.log("value type is missing");
+        }
 
-    // private deleteRequest() {
-    //     //delete users
-    //     app.delete('/table=:tableName', (req, res) =>{
-    //         let tableName = req.param('tableName');
+        return previousValue ? previousValue +  ", " + modifiedCurrentValue : modifiedCurrentValue;
+    },"");
 
-    //         let query = `DELETE FROM ${tableName}`;
-    //         db.run(query,(err) =>{
-    //             if(err)
-    //             {
-    //                     console.log(err);
-    //             }else{
-    //                 console.log(`deleted in table ${tableName}`);
-    //             }
-    //         });
-    //         res.sendStatus(200);
-    //     });
+    return new Promise((resolve, reject) => {
+        let query = `INSERT INTO ${tableName} (${columNamesAsString}) VALUES(${valuesAsString})`;
+        db.run(query,(err) => {
+            if(err)
+            {
+                reject(err);
+            } else {
+                let selectQuery = `SELECT * FROM ${tableName} WHERE id=(SELECT max(id) FROM ${tableName})`;
+                db.get(selectQuery,(err,row) => {
+                    if(err) {
+                        reject(err);
+                        return;
+                    }
+                    if(row === undefined) {
+                        reject("row is empty")
+                        return;
+                    }
+                    console.log("hey2");
+                    resolve(callback(err,row));
+                });
+            }
+        });
 
-    //     app.delete('/table=:tableName/:id', (req, res) =>{
-    //         let tableName = req.param('tableName');
-    //         let id = req.param('id');
-        
-    //         let query = `DELETE FROM ${tableName} WHERE id="${id}"`;
-    //         db.run(query,(err) =>{
-    //             if(err)
-    //             {
-    //                     console.log(err);
-    //             }else{
-    //                 console.log(`data deleted in table ${tableName}`);
-    //             }
-    //         });
-    //         res.sendStatus(200);
-    //     });
-    // }
+                
+    });
+}
 
-    // private putRequest() {
-    //     //update
-    //     //table={table}/set=name="{data}"/{id}
-    //     app.put(`/table=:tableName/set=:values/:id`, (req, res) => {
-    //         let tableName = req.param(`tableName`);
-    //         let values = req.param(`values`);
-    //         let id = req.param(`id`);
-            
-    //         let query = `UPDATE ${tableName} SET ${values} WHERE id="${id}"`;
-    //         db.run(query,(err) =>{
-    //             if(err)
-    //             {
-    //                 console.log(err);
-    //                 res.sendStatus(500);
-    //                 return;
-    //             }else{
-    //                 console.log(`data updated in table ${tableName}`);
-    //             }
-    //         });
-    //         res.sendStatus(200);
-    //     });
-    // }
+export function deleteTableRow(tableName: string, id: any, callback :(err: any) => any): any {
+    return new Promise((resolve, reject) => {
+        let query = `DELETE FROM ${tableName} WHERE id="${id}"`;
+        db.run(query,(err) =>{
+            if(err)
+            {
+                reject(err);
+            } else{
+                resolve(callback(err));
+            }
+        });
+    });
+}
+
+export function updateRecordInTable(tableName: string, id: any, columNames: any[], columValues: any[], callback :(err: any, row: any) => any): any {
+    let modifiedColumValues = columValues.map((value) => {
+        let modifiedCurrentValue = "";
+        if(typeof value === "string") {
+            modifiedCurrentValue = `\"` + value + `\"`;
+        } else if(typeof value === "number") {
+            modifiedCurrentValue = value.toString();
+        } else if (typeof value === "boolean") {
+            modifiedCurrentValue = value.toString();
+        } else {
+            console.log("value type is missing");
+        }
+        return modifiedCurrentValue;
+    });
+
+    let zipedColumsAndNames = columNames.map((value,index) => {
+        return [value, modifiedColumValues[index]];
+    });
+
+    let valuesAsString = zipedColumsAndNames.reduce((previuseValue, currentValue, currentIndex) => {
+        let groupedValue = currentValue[0] + " = " + currentValue[1];
+        return previuseValue ? previuseValue + " , " + groupedValue : groupedValue;
+    },"");
+    
+
+    return new Promise((resolve, reject) => {
+        let query = `UPDATE ${tableName} SET ${valuesAsString} WHERE id="${id}"`;
+        db.run(query,(err) =>{
+            if(err)
+            {
+                reject(err);
+                return;
+            } else {
+                getTableDataById(tableName, id , function(err, row) {
+                    resolve(callback(err,row));
+                });
+            }
+        });
+    });
+}

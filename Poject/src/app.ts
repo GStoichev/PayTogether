@@ -23,7 +23,7 @@ class App {
 
     private routes(controllers: { forEach: (arg0: (controller: any) => void) => void; }) {
         controllers.forEach(controller => {
-            this.app.use('/', controller.router)
+            this.app.use('/', controller.router);
         })
     }
 
@@ -33,7 +33,7 @@ class App {
     }
 
     private template() {
-        this.app.set('view engine', 'pug');
+        this.app.set('view engine', 'ejs');
     }
 
     public listen() {

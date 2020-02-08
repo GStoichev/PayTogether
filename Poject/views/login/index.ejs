@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+</head>
+<body>
+
+<form action="/register" method="POST">
+    <h1>Register</h1>
+        User name: <input type="text" id="name" name="name"><br>
+        Passoword: <input type="text" id="password" name="password"><br>
+        Email <input type="text" id="email" name="email"><br>
+    <button>Register</button>
+</form>
+
+<form action="/login" method="POST">
+    <h1>Login</h1>
+        User name: <input type="text" id = "name" name="name"><br>
+        Passoword: <input type="text" id = "password" name="password"><br>
+    <button>Login</button>
+</form>
+
+<h1> <%= err %></h1>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+</head>
+<body>
+<h1>Welcome, <%= user.name %></h1>
+    <form action="/user=<%=user.id%>" method="GET">
+        <button>Open my profile</button>
+    </form>
+
+    <form action="/home" method="POST">
+        <button>create new entity</button>
+    </form>
+    <br>
+
+    <% entitiesWithParticipants.forEach(function(entityWithParticipants) { %>
+        <%= entityWithParticipants.entity.name %> <br>
+        <%= entityWithParticipants.entity.desc %> <br>
+
+        <% entityWithParticipants.participants.forEach(function(participant) { %>
+            <%= participant.myName %>
+            <% if(participant.income){ %>
+                <b> income</b>
+              <% } else{ %>  
+                <b> expense</b>
+             <% } %>
+            <%= participant.otherName %>
+            <%= participant.money %> 
+            <input></input>
+            <button> Pay </button> 
+            <br>
+        <% }); %>
+
+        <%= entityWithParticipants.entity.date %> <br>
+        <br>
+    <% }); %>
+
+</body>
+</html>

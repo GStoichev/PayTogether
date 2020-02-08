@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">  </script>
+    <script>
+      $(document).ready(function(){
+        $("#addFriend").click(function(){
+            var otherId = $("#otherId").val();
+          $.post("/friends/add",{id: "<%= userId%>", other_id: otherId}, function(data){
+                console.log(data);
+          });
+        });
+      });
+    </script>
+</head>
+<body>
+<h1>Friends</h1>
+
+<input type="text" id="otherId" name="otherId"></input>
+<button id="addFriend">add friend</button>
+
+<% friends.forEach(function(friend) { %>
+    <li><%= friend.name %> </li>
+<% }); %>
+
+<h1><%=err%></h1>
+</body>
+</html>
