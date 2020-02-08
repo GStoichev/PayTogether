@@ -4,11 +4,7 @@ import sqlite from 'sqlite3';
 import { getTableData, getTableDataById, insertInTable, deleteTableRow, updateRecordInTable, insertInTableWithAutoIncrement } from "../../crudOperations";
 import { resolve } from "dns";
 import { rejects } from "assert";
-
-interface EntityParticipant {
-    friends_pair_id: number,
-    money: number
-}
+import { UserRepository } from "./user.repository";
 
 export class EntityRepository implements IReposotory<Entity,number> {
 
@@ -111,7 +107,6 @@ export class EntityRepository implements IReposotory<Entity,number> {
 
         let query = `SELECT * FROM ${this.participantsTableName} WHERE entity_id = "${entityId}"`;
         return new Promise((resolve, reject) => {
-            new Promise((resolve, reject) => {
                 this.db.all(query,(err,rows) => {
                     if(err) {
                         reject(err);
@@ -123,63 +118,25 @@ export class EntityRepository implements IReposotory<Entity,number> {
                         return;
                     }
 
-                    let entityParticipants: Array<EntityParticipant> = rows.map((row) => {                
-                        let entityParticipant: EntityParticipant = {
-                            friends_pair_id: row.friends_pair_id,
+                    let entityParticipants: Array<Participant> = rows.map((row) => {                
+                        let entityParticipant: Participant = {
+                            fr_1_id: row.friend_1_id,
+                            fr_2_id: row.friend_2_id,
                             money: row.money
                         }
                         return entityParticipant;
                     });
                     resolve(entityParticipants);
-                });
-            }).then((entityParticipants) => {
-                let resultParticipants: Array<Participant> = Array<Participant>();
-                let requests = (entityParticipants as EntityParticipant[]).reduce((promiseChain, entityParticipant) => {
-                    let query = `SELECT * FROM ${this.friendsTableName} WHERE (id = "${entityParticipant.friends_pair_id}")`;
-
-                    return promiseChain.then(() => new Promise((resolve) => {
-                        this.db.get(query,(err,row) => {
-                            if(err) {
-                                reject(err);
-                                return;
-                            }
-            
-                            if(row === undefined) {
-                                resolve();
-                                return;
-                            }
-                            let participant: Participant = {
-                                fr_1_id: row.my_id,
-                                fr_2_id: row.other_id,
-                                money: entityParticipant.money
-                            }
-                            
-                            resolve(participant);
-                        });
-                    }).then((participant) => {
-                        resultParticipants.push((participant as Participant));
-                        }).catch((err) => {
-                            rejects(err);
-                        }));
-                }, Promise.resolve()); 
-
-                requests.then(() => {
-                    resolve(resultParticipants);
-                }).catch((err) => {
-                    rejects(err);
-                });
-            }).catch((err) => {
-                reject(err);
-            });
+                });   
         });    
     }
 
-    public addParticipants(participants: Array<Participant>) {
-        let columNames = ["entity_id", "friends_pair_id", "money"];
+    public addParticipants(entity: Entity, participants: Array<Participant>): Promise<void> {
+        let columNames = ["entity_id", "friend_1_id", "friend_2_id", "money"];
         return new Promise((resolve, reject) => {
             let promisedParticipants = participants.reduce((promiseChain,participant) => {
                 return promiseChain.then(() => new Promise((resolve) => {
-                   let columValues = [participant.fr_1_id, participant.fr_2_id, participant.money];
+                   let columValues = [entity.id, participant.fr_1_id, participant.fr_2_id, participant.money];
                    insertInTableWithAutoIncrement(this.participantsTableName, columNames, columValues, function(err, row) {
                        if(row === undefined) {
                            reject("Participants are not added");
@@ -224,9 +181,13 @@ export class EntityRepository implements IReposotory<Entity,number> {
         });   
     }
 
-    public createEntityWithParticipants(entity: Entity, participants: Array<Participant>) {
-            this.create(entity).then((createdEntity) => {
-               this.addParticipants(participants); // return some answer
+    public createEntityWithParticipants(entity: Entity, participants: Array<Participant>) : Promise<void> {
+            return new Promise<void>((resolve,reject) => {
+                this.create(entity).then((createdEntity) => {
+                    resolve(this.addParticipants(createdEntity, participants));
+                 }).catch((err) => {
+                     console.log(err);
+                 });
             });
     }
 }

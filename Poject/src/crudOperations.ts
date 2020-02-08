@@ -100,7 +100,6 @@ export function insertInTableWithAutoIncrement(tableName: string, columNames: an
                         reject("row is empty")
                         return;
                     }
-                    console.log("hey2");
                     resolve(callback(err,row));
                 });
             }
