@@ -6,18 +6,22 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 })
 export class AuthService {
 
-  baseUrl = 'http://localhost:8000/login';
+  baseUrl = 'http://localhost:8000/';
   constructor(private http: HttpClient) { }
 
   login(model: any) {
     console.log(model);
     const headers = new HttpHeaders();
     this.createAuthorizationHeader(headers);
-    return this.http.post(this.baseUrl, model, {headers});
+    return this.http.post(this.baseUrl + 'login', model, {headers});
   }
 
   createAuthorizationHeader(headers: HttpHeaders) {
     headers.append('Content-Type', 'application/json');
+  }
+
+  register(model: any){
+    return this.http.post(this.baseUrl + 'register', model);
   }
 }
 

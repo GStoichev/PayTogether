@@ -7,6 +7,7 @@ import { UserRepository } from '../repositories/user.repository';
 import { EntityRepository } from '../repositories/entity.repository';
 import { Entity, ParticipantsForPreview, EntityForPreview} from '../models/entity.model';
 import { rejects } from 'assert';
+import { STATUS_CODES } from 'http';
 
 class LoginController implements IControllerBase {
     public path = '/';
@@ -112,7 +113,8 @@ class LoginController implements IControllerBase {
                }, Promise.resolve());
 
                resultEntitiesWithParticipants.then(() => {
-                    res.render('home/home', {user: user, entitiesWithParticipants: entitiesMyData, err: ""});
+                   res.send(STATUS_CODES.OK);
+                    // res.render('home/home', {user: user, entitiesWithParticipants: entitiesMyData, err: ""});
                 }).catch((err) => {
                     res.render('home/home', { user: user, err: err});    
                 });
