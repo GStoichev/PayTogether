@@ -98,9 +98,7 @@ class LoginController implements IControllerBase {
                                 resolve();
                             }));
                         },Promise.resolve()); 
-                        console.log("1a");
                         participants.then(() => {
-                            console.log("1a2");
                             resolve();
                         }).catch((err) => {
                             console.log(err);
@@ -109,8 +107,9 @@ class LoginController implements IControllerBase {
                }, Promise.resolve());
 
                resultEntitiesWithParticipants.then(() => {
-                   res.send(STATUS_CODES.OK);
-                    // res.render('home/home', {user: user, entitiesWithParticipants: entitiesMyData, err: ""});
+                    //res.render('home/home', {user: user, entitiesWithParticipants: entitiesMyData, err: ""});
+                    res.status(200);
+                    res.send(JSON.parse(JSON.stringify(user)));
                 }).catch((err) => {
                     res.render('home/home', { user: user, err: err});    
                 });
