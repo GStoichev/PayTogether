@@ -41,11 +41,15 @@ class LoginController implements IControllerBase {
         userRepo.isExisting(name).then((isExisting) => {
             if(isExisting)
             {
-                res.render('login/index', {err: "register"});
+                //res.render('login/index', {err: "register"});
+                res.status(400);
+                res.send({ "error": "Account with that name already exist!!!"});
                 return;
             }
             userRepo.create(user).then((user) => {
-                    res.render('home/home', {user: user, entitiesWithParticipants: [], err: ""});
+                    //res.render('home/home', {user: user, entitiesWithParticipants: [], err: ""});
+                    res.status(200);
+                    res.send(JSON.parse(JSON.stringify(user)));
             });
         });
     }
@@ -111,13 +115,19 @@ class LoginController implements IControllerBase {
                     res.status(200);
                     res.send(JSON.parse(JSON.stringify(user)));
                 }).catch((err) => {
-                    res.render('home/home', { user: user, err: err});    
+                    //res.render('home/home', { user: user, err: err});    
+                    res.status(500);
+                    res.send(JSON.parse(JSON.stringify(user)));
                 });
             }).catch((err) => {
-                res.render('home/home', { user: user, err: err});    
+                //res.render('home/home', { user: user, err: err});    
+                res.status(500);
+                res.send(JSON.parse(JSON.stringify(user)));
             });
         }).catch((err) => {
-            res.render('login/index', {err: err});
+            //res.render('login/index', {err: err});
+            res.status(404);
+            res.send({ "error": "User account Doesn't exist!"});
         });     
     }
 }

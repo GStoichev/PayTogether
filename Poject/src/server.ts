@@ -15,7 +15,7 @@ const options:cors.CorsOptions = {
     origin: 'http://localhost:4200'
   };
 const app = new App({
-    port: 8000,
+    port: 8080,
     controllers: [
         new HomeController(),
         new UserController(),

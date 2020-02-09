@@ -9,17 +9,21 @@ import { AuthService } from '../_services/auth.service';
 export class NavComponent implements OnInit {
 
   model: any = {};
-  logged: boolean = false;
+  logged = false;
+  user: any;
   constructor(private authService: AuthService) { }
 
   ngOnInit() {
+    this.user = localStorage.getItem('username');
   }
 
   login() {
-    this.authService.login(this.model).subscribe(next => {
-      console.log('Successfully logged in');
-      localStorage.setItem('Logged', 'true');
+    this.authService.login(this.model).subscribe(user => {
+      console.log('Successfully logged in', user);
       this.logged = true;
+      localStorage.setItem('Logged', 'true');
+      localStorage.setItem('username', user['name_']);
+      this.user = localStorage.getItem('username');
     }, error => {
       console.log('Failed to login', error);
       this.logged = false;
@@ -27,13 +31,13 @@ export class NavComponent implements OnInit {
   }
 
   loggedIn() {
-    return (!!localStorage.getItem('Logged') && localStorage.getItem('Logged')==='true');
+    return (!!localStorage.getItem('Logged') && localStorage.getItem('Logged') === 'true');
   }
 
-  logOut(){
+  logOut() {
     this.logged = false;
-    return localStorage.removeItem('Logged');
-
+    localStorage.removeItem('Logged');
+    localStorage.removeItem('username');
   }
 
 }
