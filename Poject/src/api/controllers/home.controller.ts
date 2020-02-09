@@ -17,7 +17,8 @@ class HomeController implements IControllerBase {
 
     public initRoutes() {
         this.router.get(`${this.path}`, this.loadEntries);
-        this.router.post(`${this.path}`, this.createEntity);
+        this.router.post(`${this.path}`, this.pay);
+        //this.router.post(`${this.path}`, this.pay);
         //this.router.post('/register', this.register);
         //this.router.post(`/login`, this.login);
     }
@@ -78,11 +79,45 @@ class HomeController implements IControllerBase {
     }
 
     pay = (req: Request, res: Response) => {
+        let userRepo = new UserRepository();
+        let entityRepo = new EntityRepository();
+        
+        entityRepo.updateMoneyValue(14,"59f1ce52-322e-4df1-aaaf-f16758d35ff4","9f92828a-7493-4f40-8c22-e7c778c0ce32",10).then(() => {
+            
+            res.send();
+        }).catch((err) => {
+            console.log(`${err}`);
+        });
+        
         //user
         //value_money
         //entity
         //
     }
+
+    deleteEntity = (req: Request, res: Response) => {
+        let userRepo = new UserRepository();
+        let entityRepo = new EntityRepository();
+        
+        let entity = new Entity();
+        entity.id = 14;
+
+        entityRepo.deleteParticipants(14).then(() => {
+            entityRepo.delete(entity).then(() => {
+                res.send("deleted succesfuly");
+            }).catch((err) => {
+                console.log(err);
+            });
+        }).catch((err) => {
+            console.log(err);
+            });
+        
+        //user
+        //value_money
+        //entity
+        //
+    }
+
     // register = (req: Request, res: Response) => {
     //     res.render('home/home',{test: "register"});
     // }
