@@ -38,12 +38,6 @@ class LoginController implements IControllerBase {
         let user = new User(uuid(),name,email);
         user.password = password;
 
-        let entity = new Entity();
-
-        entity.name = "testNameEntity";
-        entity.desc = "testDescEntity";
-        entity.date = new Date();
-
         userRepo.isExisting(name).then((isExisting) => {
             if(isExisting)
             {
@@ -51,10 +45,7 @@ class LoginController implements IControllerBase {
                 return;
             }
             userRepo.create(user).then((user) => {
-                entityRepo.create(entity).then((entity) => {
-                    let entities: Entity[] = [entity];
-                    res.render('home/home', {user: user, entities : entities});
-                });
+                    res.render('home/home', {user: user, entitiesWithParticipants: [], err: ""});
             });
         });
     }
@@ -104,10 +95,15 @@ class LoginController implements IControllerBase {
                                         resolve();
                                     });
                                 }
+                                resolve();
                             }));
                         },Promise.resolve()); 
+                        console.log("1a");
                         participants.then(() => {
+                            console.log("1a2");
                             resolve();
+                        }).catch((err) => {
+                            console.log(err);
                         });
                    })); 
                }, Promise.resolve());

@@ -1,3 +1,8 @@
+export interface ParticipantMoneyChange {
+    id: number,
+    current_amount: number
+}
+
 export interface Participant {
     fr_1_id: string,
     fr_2_id: string,

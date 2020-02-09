@@ -1,10 +1,11 @@
 import { IReposotory } from "../interfaces/IRepository.interface";
-import { Entity, Participant, EntityWithParticipants } from "../models/entity.model";
+import { Entity, Participant, EntityWithParticipants, ParticipantMoneyChange } from "../models/entity.model";
 import sqlite from 'sqlite3';
 import { getTableData, getTableDataById, insertInTable, deleteTableRow, updateRecordInTable, insertInTableWithAutoIncrement } from "../../crudOperations";
 import { resolve } from "dns";
 import { rejects } from "assert";
 import { UserRepository } from "./user.repository";
+import { isPrimitive } from "util";
 
 export class EntityRepository implements IReposotory<Entity,number> {
 
@@ -175,6 +176,7 @@ export class EntityRepository implements IReposotory<Entity,number> {
                 requests.then((result) => {
                     resolve(entitiesWithParticipants);
                 }).catch((err) => {
+                    console.log("hye3");
                     reject(err);
                 });
             });
@@ -189,5 +191,87 @@ export class EntityRepository implements IReposotory<Entity,number> {
                      console.log(err);
                  });
             });
+    }
+
+    public updateParticipantRecord(participantId: number, fr_1_id: string, fr_2_id: string, money: number) {
+        let columNames = ["friend_1_id", "friend_2_id", "money"];
+        let columValues = [fr_1_id, fr_2_id, money];
+
+         return updateRecordInTable(this.participantsTableName, participantId, columNames, columValues, function(err,row) {
+            if(err) {
+                return [];
+            }
+            if(row === undefined) {
+                return [];
+            }
+            let id = row.id;
+            let name = row.entity_id;
+            let fr1 = row.friend_1_id;
+            let fr2 = row.friend_2_id;
+        });
+    }
+
+    public updateMoneyValue(entityId: number, fr_1_id: string, fr_2_id: string, paidAmount: number) {
+        let query = `SELECT * from ${this.participantsTableName} WHERE entity_id="${entityId}" AND friend_1_id="${fr_1_id}" AND friend_2_id="${fr_2_id}"`;
+        return new Promise((resolve, reject) => {
+            
+            new Promise((resolve,reject) =>  {     
+                this.db.get(query,(err, row) => {
+                    if(err) {
+                        reject(err);
+                        return;
+                    }
+        
+                    if(!row) {
+                        reject("entity not found")
+                        return;
+                    }
+        
+                    let curentAmount = row.money - paidAmount;
+                    let participantMoneyChange: ParticipantMoneyChange = {
+                        id: row.id,
+                        current_amount: curentAmount
+                    }
+                    resolve(participantMoneyChange);
+                });
+            }).then((participantMoneyChange) => {
+                let currentAmount = (participantMoneyChange as ParticipantMoneyChange).current_amount;
+                let id = (participantMoneyChange as ParticipantMoneyChange).id;
+                if(currentAmount < 0) {
+                    this.updateParticipantRecord(id,fr_2_id,fr_1_id,Math.abs(currentAmount)).then(() => {
+                        resolve();
+                    });
+                } else if (currentAmount > 0) {
+                    this.updateParticipantRecord(id,fr_1_id,fr_2_id,currentAmount).then(() => {
+                        resolve();
+                    });
+                } else {
+                    deleteTableRow(this.participantsTableName, id, (err) => {
+                        if(err) {
+                            reject(err);
+                            return;
+                        }
+                    }).then(() => {
+                        resolve();
+                    });
+                    //check is u should delete entity
+                }
+            }).catch((err) => {
+                console.log(err);
+            });
+        });
+    }
+
+    public deleteParticipants(entity_id: number) {
+        let query = `DELETE from ${this.participantsTableName} WHERE entity_id="${entity_id}"`
+
+        return new Promise((resolve,reject) => {
+            this.db.run(query,(err) => {
+                if(err) {
+                    reject(err)
+                }
+                resolve();
+            });
+        })
     }
 }
