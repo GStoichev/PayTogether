@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { User, UI } from '../_models/User';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class AuthService {
     console.log(model);
     const headers = new HttpHeaders();
     this.createAuthorizationHeader(headers);
-    return this.http.post(this.baseUrl + 'login', model, {headers});
+    return this.http.post<UI>(this.baseUrl + 'login', model, {headers});
   }
 
   createAuthorizationHeader(headers: HttpHeaders) {
@@ -23,5 +24,11 @@ export class AuthService {
   register(model: any){
     return this.http.post(this.baseUrl + 'register', model);
   }
+
+  loggedIn() {
+    const token = localStorage.getItem('Logged');
+    return !!token;
+  }
+
 }
 
