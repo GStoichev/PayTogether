@@ -97,9 +97,7 @@ class LoginController implements IControllerBase {
                                 resolve();
                             }));
                         },Promise.resolve()); 
-                        console.log("1a");
                         participants.then(() => {
-                            console.log("1a2");
                             resolve();
                         }).catch((err) => {
                             console.log(err);

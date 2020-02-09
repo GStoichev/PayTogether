@@ -17,7 +17,7 @@ class HomeController implements IControllerBase {
 
     public initRoutes() {
         this.router.get(`${this.path}`, this.loadEntries);
-        this.router.post(`${this.path}`, this.pay);
+        this.router.post(`${this.path}`, this.deleteEntity);
         //this.router.post(`${this.path}`, this.pay);
         //this.router.post('/register', this.register);
         //this.router.post(`/login`, this.login);
@@ -82,7 +82,7 @@ class HomeController implements IControllerBase {
         let userRepo = new UserRepository();
         let entityRepo = new EntityRepository();
         
-        entityRepo.updateMoneyValue(14,"59f1ce52-322e-4df1-aaaf-f16758d35ff4","9f92828a-7493-4f40-8c22-e7c778c0ce32",10).then(() => {
+        entityRepo.updatePayValue(14,"59f1ce52-322e-4df1-aaaf-f16758d35ff4","9f92828a-7493-4f40-8c22-e7c778c0ce32",10).then(() => {
             
             res.send();
         }).catch((err) => {
@@ -92,7 +92,17 @@ class HomeController implements IControllerBase {
         //user
         //value_money
         //entity
-        //
+    }
+
+    addMoreDept = (req: Request, res: Response) => {
+        let userRepo = new UserRepository();
+        let entityRepo = new EntityRepository();
+        
+        entityRepo.updateDeptValue(14,"59f1ce52-322e-4df1-aaaf-f16758d35ff4","9f92828a-7493-4f40-8c22-e7c778c0ce32",10).then(() => {         
+            res.send("updated succes");
+        }).catch((err) => {
+            console.log(`${err}`);
+        });
     }
 
     deleteEntity = (req: Request, res: Response) => {
@@ -111,20 +121,7 @@ class HomeController implements IControllerBase {
         }).catch((err) => {
             console.log(err);
             });
-        
-        //user
-        //value_money
-        //entity
-        //
     }
-
-    // register = (req: Request, res: Response) => {
-    //     res.render('home/home',{test: "register"});
-    // }
-
-    // login = (req: Request, res: Response) => {
-    //     res.render('home/home',{test: "login"});
-    // }
 }
 
 export default HomeController

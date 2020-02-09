@@ -176,7 +176,6 @@ export class EntityRepository implements IReposotory<Entity,number> {
                 requests.then((result) => {
                     resolve(entitiesWithParticipants);
                 }).catch((err) => {
-                    console.log("hye3");
                     reject(err);
                 });
             });
@@ -211,7 +210,7 @@ export class EntityRepository implements IReposotory<Entity,number> {
         });
     }
 
-    public updateMoneyValue(entityId: number, fr_1_id: string, fr_2_id: string, paidAmount: number) {
+    public updatePayValue(entityId: number, fr_1_id: string, fr_2_id: string, paidAmount: number) {
         let query = `SELECT * from ${this.participantsTableName} WHERE entity_id="${entityId}" AND friend_1_id="${fr_1_id}" AND friend_2_id="${fr_2_id}"`;
         return new Promise((resolve, reject) => {
             
@@ -227,7 +226,7 @@ export class EntityRepository implements IReposotory<Entity,number> {
                         return;
                     }
         
-                    let curentAmount = row.money - paidAmount;
+                    let curentAmount = row.money - Math.abs(paidAmount);
                     let participantMoneyChange: ParticipantMoneyChange = {
                         id: row.id,
                         current_amount: curentAmount
@@ -262,13 +261,50 @@ export class EntityRepository implements IReposotory<Entity,number> {
         });
     }
 
+    public updateDeptValue(entityId: number, fr_1_id: string, fr_2_id: string, paidAmount: number) {
+        let query = `SELECT * from ${this.participantsTableName} WHERE entity_id="${entityId}" AND friend_1_id="${fr_1_id}" AND friend_2_id="${fr_2_id}"`;
+        return new Promise((resolve, reject) => {
+            
+            new Promise((resolve,reject) =>  {     
+                this.db.get(query,(err, row) => {
+                    if(err) {
+                        reject(err);
+                        return;
+                    }
+        
+                    if(!row) {
+                        reject("entity not found")
+                        return;
+                    }
+        
+                    let curentAmount = row.money + Math.abs(paidAmount);
+                    let participantMoneyChange: ParticipantMoneyChange = {
+                        id: row.id,
+                        current_amount: curentAmount
+                    }
+                    resolve(participantMoneyChange);
+                });
+            }).then((participantMoneyChange) => {
+                let currentAmount = (participantMoneyChange as ParticipantMoneyChange).current_amount;
+                let id = (participantMoneyChange as ParticipantMoneyChange).id;
+                if (currentAmount > 0) {
+                    this.updateParticipantRecord(id,fr_1_id,fr_2_id,currentAmount).then(() => {
+                        resolve();
+                    });
+                } 
+            }).catch((err) => {
+                console.log(err);
+            });
+        });
+    }
+
     public deleteParticipants(entity_id: number) {
         let query = `DELETE from ${this.participantsTableName} WHERE entity_id="${entity_id}"`
 
         return new Promise((resolve,reject) => {
             this.db.run(query,(err) => {
                 if(err) {
-                    reject(err)
+                    reject(err);
                 }
                 resolve();
             });
