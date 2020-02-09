@@ -106,7 +106,9 @@ class LoginController implements IControllerBase {
                }, Promise.resolve());
 
                resultEntitiesWithParticipants.then(() => {
-                    res.render('home/home', {user: user, entitiesWithParticipants: entitiesMyData, err: ""});
+                    //res.render('home/home', {user: user, entitiesWithParticipants: entitiesMyData, err: ""});
+                    res.status(200);
+                    res.send(JSON.parse(JSON.stringify(user)));
                 }).catch((err) => {
                     res.render('home/home', { user: user, err: err});    
                 });
