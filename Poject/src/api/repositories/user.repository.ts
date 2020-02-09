@@ -39,6 +39,10 @@ export class UserRepository implements IReposotory<User,string> {
 
     public readById(id: string): Promise<User> {
         return getTableDataById(`users`,id, function(err, row) {
+            if(err)
+            {
+               throw err;
+            }
                 if(row === undefined) {
                     return [];
                 }
@@ -240,7 +244,7 @@ export class UserRepository implements IReposotory<User,string> {
                     reject(err);
                     return;
                 }
-                
+
                 row === undefined ? reject("users are not friends") : resolve(row.id); 
             });
         });

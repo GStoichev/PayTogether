@@ -4,7 +4,7 @@ import IControllerBase from '../interfaces/IControllerBase.interface'
 import { UserRepository } from '../repositories/user.repository'
 import { EntityRepository } from '../repositories/entity.repository'
 import uuid = require('uuid')
-import { Entity, Participant } from '../models/entity.model'
+import { Entity, Participant, ParticipantsForPreview, EntityForPreview } from '../models/entity.model'
 import { rejects } from 'assert'
 
 class HomeController implements IControllerBase {
@@ -17,10 +17,8 @@ class HomeController implements IControllerBase {
 
     public initRoutes() {
         this.router.get(`${this.path}`, this.loadEntries);
-        this.router.post(`${this.path}`, this.deleteEntity);
-        //this.router.post(`${this.path}`, this.pay);
-        //this.router.post('/register', this.register);
-        //this.router.post(`/login`, this.login);
+        this.router.post(`${this.path}`, this.createEntity);
+        this.router.post(`${this.path}/checks`, this.getEntitiesForUser)
     }
 
     loadEntries = (req: Request, res: Response) => {
@@ -121,6 +119,78 @@ class HomeController implements IControllerBase {
         }).catch((err) => {
             console.log(err);
             });
+    }
+
+    getEntitiesForUser = (req: Request, res: Response) => {
+        let userId = req.body.id_;
+        let userName = req.body.name_;
+
+        let userRepo = new UserRepository();
+        let entityRepo = new EntityRepository();
+
+        entityRepo.readEntitiesWithParticipants().then((entitiesWithParticipants) => {
+            
+            let entitiesMyData: EntityForPreview[] = [];
+
+            let resultEntitiesWithParticipants = entitiesWithParticipants.reduce((promiseChain, entityWithParticipants) => {
+                return promiseChain.then(() => new Promise((resolve) => {
+                    let shouldAddEntity = true;
+                    let participants = entityWithParticipants.participants.reduce((participantPromiseChain, participant) => {
+                        return participantPromiseChain.then(() => new Promise((resolve,reject) => { 
+                            if((participant.fr_1_id == userId) || (participant.fr_2_id == userId)) {
+                                if(shouldAddEntity) {
+                                    let newEntityWithParticipants: EntityForPreview = {
+                                        entity: entityWithParticipants.entity,
+                                        participants: []
+                                    }
+                                    entitiesMyData.push(newEntityWithParticipants);
+                                    shouldAddEntity = false;
+                                }
+                                
+                                let income = true;
+                                let otherId = participant.fr_1_id;
+                                if(participant.fr_1_id == userId) {
+                                    income = false;
+                                    otherId = participant.fr_2_id;
+                                }
+                                
+                                userRepo.readById(otherId).then((otherUser) => {
+                                    let participantForPreview: ParticipantsForPreview = {
+                                        myName: userName,
+                                        otherName: otherUser.name,
+                                        money: participant.money,
+                                        income: income
+                                    }
+                                    entitiesMyData[entitiesMyData.length - 1].participants.push(participantForPreview);
+                                    resolve();
+                                }).catch((err) => {
+                                    reject(err);
+                                });
+                            }
+                            else {
+                                resolve()
+                            }
+                        }));
+                    },Promise.resolve()); 
+                    participants.then(() => {
+                        resolve();
+                    }).catch((err) => {
+                        console.log(err);
+                    });
+               })); 
+           }, Promise.resolve());
+
+           resultEntitiesWithParticipants.then(() => {
+            res.status(200);
+            res.send(JSON.parse(JSON.stringify(entitiesMyData)));
+            }).catch((err) => {    
+            res.status(404);
+            res.send({ "error": "Checks are not found"});
+            });
+        }).catch((err) => {
+        res.status(404);
+        res.send({ "error": "Checks are not found"});
+        });
     }
 }
 
