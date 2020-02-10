@@ -11,8 +11,9 @@ import { User } from '../_models/User';
 export class CheckListComponent implements OnInit {
 
   checks: any;
+  editModeFlag = false;
 
-  constructor( public loggedUser: User, private checkService: CheckService) {
+  constructor(public loggedUser: User, private checkService: CheckService) {
   }
 
   ngOnInit() {
@@ -22,6 +23,11 @@ export class CheckListComponent implements OnInit {
     }, error => {
       console.log(error);
     });
+
   }
 
+  editMode() {
+    this.editModeFlag = !this.editModeFlag;
+    console.log(this.editModeFlag);
+  }
 }
