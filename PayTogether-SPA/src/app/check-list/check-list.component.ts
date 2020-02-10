@@ -22,7 +22,7 @@ export class CheckListComponent implements OnInit {
 
   loadChecks() {
     console.log('user: ', this.loggedUser);
-    this.checkService.getChecks(this.loggedUser).subscribe((checks) => {
+    this.checkService.getChecks(this.loggedUser.ui).subscribe((checks) => {
       console.log('The checks: ', checks);
     }, error => {
       console.log(error);

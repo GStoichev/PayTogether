@@ -11,7 +11,7 @@ export class CheckService {
   constructor(private http: HttpClient) { }
 
   getChecks(user): Observable<Check[]> {
-    return this.http.post<Check[]>(this.baseUrl + 'checks', user);
+    return this.http.post<Check[]>(this.baseUrl + 'home/checks', user);
   }
 
   getCheck(id,user): Observable<Check> {
