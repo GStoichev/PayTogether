@@ -20,6 +20,7 @@ class FriendsController implements IControllerBase {
     }
 
     showAllFriends = (req: Request, res: Response) => {
+        console.log(JSON.stringify(req.body));
         let id = req.body.id_;
         let userRepo = new UserRepository();
         
@@ -35,19 +36,22 @@ class FriendsController implements IControllerBase {
     }
 
     addFriend = (req: Request, res: Response) => {
-        let id = req.body.id;
-        let otherId = req.body.other_id;
-        console.log(`id ${id} | otherId ${otherId}`);
+        let id = req.body.user.id_;
+        let otherId = req.body.id;
+        
         let userRepo = new UserRepository();
 
         userRepo.addFriend(id, otherId).then((friend) => {
             if(friend) {
-                res.send({new_friend: friend});
+                res.status(200);
+                res.send(JSON.parse(JSON.stringify(friend)));
             } else{
                 console.log("Should not happen");
+                res.status(404);
                 res.send();
             }
         }).catch((err) => {
+            res.status(404);
             res.send(err);
         });
 

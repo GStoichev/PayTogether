@@ -10,6 +10,7 @@ import { FriendService } from '../_services/friend.service';
 export class FriendComponent implements OnInit {
 
   friends: any;
+  friendId: string;
   
   constructor( public loggedUser: User, private friendService: FriendService) {
   }
@@ -20,6 +21,15 @@ export class FriendComponent implements OnInit {
       this.friends = friends;
     }, error => {
       console.log(error);
+    });
+  }
+
+  addFriend() {
+    console.log(this.friendId);
+    this.friendService.addFriend(this.friendId,this.loggedUser.ui).subscribe(user => {
+      console.log('Added succesfuly');
+    }, error => {
+      console.log('Failed to add friend', error); 
     });
   }
 
