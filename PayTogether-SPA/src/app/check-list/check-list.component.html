@@ -1,7 +1,37 @@
 <div class="container">
   <div class="row">
     <div class="col-lg-2 col-mg-3 col-lg-6">
-      <!-- <p *ngFor="let user of list"></p> -->
+      <p>Hiiiii</p>
+      <div *ngFor="let check of checks">
+        <label>Name:</label> {{ check["entity"]["name_"] }}
+        <br />
+        <label>Description:</label> {{ check["entity"]["desc_"] }}
+        <br />
+        <label>Participants:</label>
+        <div class="container">
+          <table>
+            <div *ngFor="let user of check['participants']" class="form-group">
+              <tr>
+                <td style="width: 30px;">{{ user["otherName"] }}</td>
+                <!-- <td style="color:{{user['income'] ? 'green' : 'red'}}"> -->
+                <td style="width: 30px;">
+                  {{ (user["income"] ? "+" : "-") + user["money"] }}
+                </td>
+                <td>
+                  <button class="btn">
+                    Edit
+                  </button>
+                </td>
+                <td>
+                  <button class="btn">
+                    Pay
+                  </button>
+                </td>
+              </tr>
+            </div>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </div>

@@ -11,10 +11,12 @@ import { User } from '../_models/User';
 export class NavComponent implements OnInit {
 
   model: any = {};
+  username: string;
   logged = false;
   constructor( public loggedUser: User, private authService: AuthService, private router: Router) { }
 
   ngOnInit() {
+    this.username = localStorage.getItem('username');
   }
 
   login() {
@@ -22,8 +24,9 @@ export class NavComponent implements OnInit {
       this.loggedUser.ui = user;
       this.logged = true;
       localStorage.setItem('Logged', 'true');
-      localStorage.setItem('username', this.loggedUser.ui.name_);
-      console.log('Successfully logged in', this.loggedUser);
+      localStorage.setItem('username', user.name_); // this.loggedUser.ui.name_);
+      this.username = localStorage.getItem('username');
+      // console.log('Successfully logged in', this.loggedUser);
       this.router.navigate(['/check-list']);
     }, error => {
       console.log('Failed to login', error);

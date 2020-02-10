@@ -10,20 +10,15 @@ import { User } from '../_models/User';
 })
 export class CheckListComponent implements OnInit {
 
-  checks: Check[];
+  checks: any;
 
-  constructor( public loggedUser: User, private checkService: CheckService) { 
-    console.log('logging',this.loggedUser);
+  constructor( public loggedUser: User, private checkService: CheckService) {
   }
 
   ngOnInit() {
-    this.loadChecks();
-  }
-
-  loadChecks() {
-    console.log('user: ', this.loggedUser);
     this.checkService.getChecks(this.loggedUser.ui).subscribe((checks) => {
       console.log('The checks: ', checks);
+      this.checks = checks;
     }, error => {
       console.log(error);
     });
