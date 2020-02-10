@@ -6,7 +6,7 @@ import uuid from 'uuid/v4';
 import { UserRepository } from '../repositories/user.repository';
 
 class FriendsController implements IControllerBase {
-    public path = '/friends';
+    public path = '/friend';
     public router = express.Router();
 
     constructor() {
@@ -14,20 +14,23 @@ class FriendsController implements IControllerBase {
     }
 
     public initRoutes() {
-        this.router.get(this.path + `/:id`, this.showAllFriends);
+        this.router.post(this.path + `/friends`, this.showAllFriends);
+        //this.router.post(this.path + `/:id`, this.getFriend);
         this.router.post(this.path + `/add`, this.addFriend);
     }
 
     showAllFriends = (req: Request, res: Response) => {
-        let id = req.params.id;
+        let id = req.body.id_;
         let userRepo = new UserRepository();
         
         userRepo.getAllFriends(id).then((friends) => {
-            console.log(friends.length);
-            res.render('user/friends', {friends: friends, err: "" , userId: id});
+            res.status(200);
+            res.send(JSON.parse(JSON.stringify(friends)))
+
         }).catch((err) => {
-            res.render('user/friends', {friends: [], err: err, userId: id});
-            //res.render("user/user", {err: err});
+            console.log(err);
+            res.status(404)
+            res.send({ "error" : "You don't have any friends" });
         });
     }
 
