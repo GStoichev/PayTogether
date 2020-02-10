@@ -25,7 +25,7 @@ export class FriendComponent implements OnInit {
   }
 
   addFriend() {
-    console.log(this.friendId);
+    
     this.friendService.addFriend(this.friendId,this.loggedUser.ui).subscribe(user => {
       console.log('Added succesfuly');
     }, error => {
