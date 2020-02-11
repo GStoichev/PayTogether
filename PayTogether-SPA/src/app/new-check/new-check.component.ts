@@ -24,8 +24,27 @@ export class NewCheckComponent implements OnInit {
     })
   }
   submitData() {
-    this.model.user = this.loggedUser.ui.id_;
-    this.checkService.addCheck(this.model).subscribe(() => {
+    let data: any = {
+      entity: { name: this.model.name, description: this.model.description },
+      participants: []
+    };
+    if (this.model.income == 'true') {
+      console.log(1);
+      data.participants.push({
+        friend1: this.model.friend,
+        friend2: this.loggedUser.ui.id_,
+        money: this.model.money
+      });
+    }
+    if (this.model.income == 'false') {
+      console.log(2);
+      data.participants.push({
+        friend1: this.loggedUser.ui.id_,
+        friend2: this.model.friend,
+        money: this.model.money
+      });
+    }
+    this.checkService.addCheck(data).subscribe(() => {
       this.router.navigate(['/check-list']);
     });
   }
