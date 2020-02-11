@@ -10,7 +10,7 @@ import { NewCheckComponent } from './new-check/new-check.component';
 export const appRoutes: Routes = [
     { path: 'home', component: HomeComponent },
     { path: 'friend', component: FriendComponent },
-    { path: 'profile', component: ProfileComponent },
+    { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
     { path: 'check-list', component: CheckListComponent, canActivate: [AuthGuard] },
     { path: 'new-check', component: NewCheckComponent, canActivate: [AuthGuard] },
     { path: '**', redirectTo: 'home', pathMatch: 'full' },
