@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Check } from '../_models/check';
-import { Http2ServerRequest } from 'http2';
 
 @Injectable({
   providedIn: 'root'
