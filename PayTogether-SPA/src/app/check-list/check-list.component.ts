@@ -20,9 +20,9 @@ export class CheckListComponent implements OnInit {
     this.checkService.getChecks(this.loggedUser.ui).subscribe((checks) => {
       console.log('The checks: ', checks);
       this.checks = checks;
-      this.checks = this.checks.forEach(element => {
+      // this.checks = this.checks.forEach(element => {
 
-      });
+      // });
     }, error => {
       console.log(error);
     });
