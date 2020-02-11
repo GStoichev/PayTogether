@@ -18,4 +18,8 @@ export class CheckService {
     return this.http.post<Check>(this.baseUrl + 'checks/' + id, user);
   }
 
+  addCheck(entity): Observable<Check> {
+    return this.http.post<Check>(this.baseUrl + 'create', entity);
+  }
+
 }

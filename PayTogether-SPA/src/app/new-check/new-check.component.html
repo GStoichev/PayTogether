@@ -26,8 +26,8 @@
         </div>
       </div>
       <label>Pick a friend? </label>
-      <select class="form-control">
-        <option *ngFor="let friend of friends" value="{{friend['id_']}}" name="friend" [(ngModel)]="model.friend"> {{friend['name_']}}</option>
+      <select class="form-control" name="friend"  [(ngModel)]="model.friend">
+        <option *ngFor="let friend of friends" value="{{friend['id_']}}"> {{friend['name_']}}</option>
       </select>
     </div>
 
