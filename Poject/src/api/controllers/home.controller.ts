@@ -16,8 +16,8 @@ class HomeController implements IControllerBase {
     }
 
     public initRoutes() {
-        this.router.get(`${this.path}`, this.loadEntries);
-        this.router.post(`${this.path}`, this.createEntity);
+        // this.router.get(`${this.path}`, this.loadEntries);
+        this.router.post(`${this.path} `, this.createEntity);
         this.router.post(`${this.path}/checks`, this.getEntitiesForUser)
     }
 
@@ -29,29 +29,29 @@ class HomeController implements IControllerBase {
         let userRepo = new UserRepository();
         let entityRepo = new EntityRepository();
 
+        let checkName = req.body.check_name;
+        let checkDesc = req.body.check_description;
+
+        let participantsJSON = req.body.participants;
+
         let entity = new Entity();
-        entity.name = "testNameEntity";
-        entity.desc = "testDescEntity";
+        entity.name = checkName;
+        entity.desc = checkDesc;
         entity.date = new Date();
 
-        let frs : Participant[] = [];
+        let participants : Participant[] = [];
 
-        let fr1 : Participant = {
-            fr_1_id: "0a4fc957-a62a-47e3-8077-ab6255e1c21b",
-            fr_2_id: "59f1ce52-322e-4df1-aaaf-f16758d35ff4",
-            money: 10
+        for(let participant of participantsJSON) {
+            let tempParticipant : Participant = {
+                fr_1_id: participant.friend_1_id,
+                fr_2_id: participant.friend_2_id,
+                money: participant.money
+            }
+
+            participants.push(tempParticipant);
         }
-
-        let fr2 : Participant = {
-            fr_1_id: "59f1ce52-322e-4df1-aaaf-f16758d35ff4",
-            fr_2_id: "9f92828a-7493-4f40-8c22-e7c778c0ce32",
-            money: 12
-        }
-
-        frs.push(fr1);
-        frs.push(fr2);
         
-        let results = frs.reduce((promiseChain, fr) => {
+        let results = participants.reduce((promiseChain, fr) => {
             return promiseChain.then(() => new Promise((resolve,reject) => {
                 userRepo.areWeFriends(fr.fr_1_id, fr.fr_2_id).then((areWeFriends) => {
                     if(!areWeFriends)
@@ -66,7 +66,7 @@ class HomeController implements IControllerBase {
         }, Promise.resolve());
         
         results.then(() => {
-            entityRepo.createEntityWithParticipants(entity, frs).then(() => {
+            entityRepo.createEntityWithParticipants(entity, participants).then(() => {
                 res.send();
             }).catch((err) => {
                 console.log(err);
