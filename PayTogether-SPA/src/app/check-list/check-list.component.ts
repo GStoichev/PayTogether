@@ -12,7 +12,7 @@ import { Router } from '@angular/router';
 export class CheckListComponent implements OnInit {
 
   checks: any;
-  addAddInput = false;
+  model: any = {};
 
   constructor(public loggedUser: User, private checkService: CheckService, private router: Router) {
   }
@@ -30,9 +30,26 @@ export class CheckListComponent implements OnInit {
 
   }
 
-  addInput() {
-    this.addAddInput = !this.addAddInput;
+  addNewValue(i, j, entity_id, friend_id, income,param) {
+    // console.log(this.model['newValue' + i + '_' + j]);
+    this.model.value = this.model['newValue' + i + '_' + j];
+    this.model.entity_id = entity_id;
+    this.model.friend_id1 = income === 'false' ? this.loggedUser.ui.id_ : friend_id;
+    this.model.friend_id2 = income === 'true' ? friend_id : this.loggedUser.ui.id_;
+    if(param===1){
+    this.checkService.addToCheck(this.model).subscribe(() => {
+      console.log('success');
+    }, err => {
+      console.log(err);
+    });}
+    if(param===2){ 
+      this.checkService.payCheck(this.model).subscribe(() => {
+      console.log('success');
+    }, err => {
+      console.log(err);
+    });}
   }
+
 
   deleteCheck(data) {
     this.checkService.deleteCheck(data).subscribe(() => {
