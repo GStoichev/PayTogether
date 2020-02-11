@@ -16,38 +16,37 @@ class HomeController implements IControllerBase {
     }
 
     public initRoutes() {
-        // this.router.get(`${this.path}`, this.loadEntries);
-        this.router.post(`${this.path} `, this.createEntity);
+        this.router.post(`/create`, this.createEntity);
         this.router.post(`${this.path}/checks`, this.getEntitiesForUser)
-    }
-
-    loadEntries = (req: Request, res: Response) => {
-        console.log("heyy");
+        this.router.post(`${this.path}/pay`, this.pay);
+        this.router.post(`${this.path}/dept`, this.addMoreDept);
+        this.router.post(`${this.path}/delete`, this.deleteEntity);
     }
 
     createEntity = (req: Request, res: Response) => {
+        console.log(JSON.stringify(req.body));
         let userRepo = new UserRepository();
         let entityRepo = new EntityRepository();
 
-        let checkName = req.body.check_name;
-        let checkDesc = req.body.check_description;
+        let entityName = req.body.entity.name;
+        let entityDesc = req.body.entity.description;
 
         let participantsJSON = req.body.participants;
 
         let entity = new Entity();
-        entity.name = checkName;
-        entity.desc = checkDesc;
+        entity.name = entityName;
+        entity.desc = entityDesc;
         entity.date = new Date();
 
         let participants : Participant[] = [];
 
         for(let participant of participantsJSON) {
             let tempParticipant : Participant = {
-                fr_1_id: participant.friend_1_id,
-                fr_2_id: participant.friend_2_id,
+                fr_1_id: participant.friend1,
+                fr_2_id: participant.friend2,
                 money: participant.money
             }
-
+    
             participants.push(tempParticipant);
         }
         
@@ -58,8 +57,10 @@ class HomeController implements IControllerBase {
                     {
                         reject("We are not friends");
                     }
+                    console.log("HELLO3");
                     resolve();
                 }).catch((err) => {
+                    console.log("HELLO2");
                     reject(err);
                 });
             }));
@@ -67,12 +68,15 @@ class HomeController implements IControllerBase {
         
         results.then(() => {
             entityRepo.createEntityWithParticipants(entity, participants).then(() => {
+                res.status(200);
                 res.send();
             }).catch((err) => {
                 console.log(err);
             });
         }).catch((err) => {
             console.log(`${err} | entity not created properly`);
+            res.status(404);
+            res.send({"error": "Check is not created"});
         });
     }
 
