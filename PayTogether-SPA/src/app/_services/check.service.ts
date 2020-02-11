@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Check } from '../_models/check';
+import { Http2ServerRequest } from 'http2';
 
 @Injectable({
   providedIn: 'root'
@@ -14,12 +15,16 @@ export class CheckService {
     return this.http.post<Check[]>(this.baseUrl + 'home/checks', user);
   }
 
-  getCheck(id,user): Observable<Check> {
+  getCheck(id, user): Observable<Check> {
     return this.http.post<Check>(this.baseUrl + 'checks/' + id, user);
   }
 
   addCheck(entity): Observable<Check> {
     return this.http.post<Check>(this.baseUrl + 'create', entity);
+  }
+
+  deleteCheck(id) {
+    return this.http.delete(this.baseUrl + 'check', id);
   }
 
 }

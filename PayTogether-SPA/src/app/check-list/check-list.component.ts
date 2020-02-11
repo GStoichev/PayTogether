@@ -2,6 +2,7 @@ import { Component, OnInit, ɵCodegenComponentFactoryResolver } from '@angular/c
 import { Check } from '../_models/check';
 import { CheckService } from '../_services/check.service';
 import { User } from '../_models/User';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-check-list',
@@ -13,7 +14,7 @@ export class CheckListComponent implements OnInit {
   checks: any;
   addAddInput = false;
 
-  constructor(public loggedUser: User, private checkService: CheckService) {
+  constructor(public loggedUser: User, private checkService: CheckService, private router: Router) {
   }
 
   ngOnInit() {
@@ -31,5 +32,13 @@ export class CheckListComponent implements OnInit {
 
   addInput() {
     this.addAddInput = !this.addAddInput;
+  }
+
+  deleteCheck(data) {
+    this.checkService.deleteCheck(data).subscribe(() => {
+      this.router.navigate(['/check-list']);
+    }, err => {
+      console.log(err);
+    });
   }
 }
