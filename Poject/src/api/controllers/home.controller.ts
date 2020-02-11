@@ -20,11 +20,10 @@ class HomeController implements IControllerBase {
         this.router.post(`${this.path}/checks`, this.getEntitiesForUser)
         this.router.post(`${this.path}/pay`, this.pay);
         this.router.post(`${this.path}/dept`, this.addMoreDept);
-        this.router.post(`${this.path}/delete`, this.deleteEntity);
+        this.router.delete(`/check`, this.deleteEntity);
     }
 
     createEntity = (req: Request, res: Response) => {
-        console.log(JSON.stringify(req.body));
         let userRepo = new UserRepository();
         let entityRepo = new EntityRepository();
 
@@ -57,10 +56,8 @@ class HomeController implements IControllerBase {
                     {
                         reject("We are not friends");
                     }
-                    console.log("HELLO3");
                     resolve();
                 }).catch((err) => {
-                    console.log("HELLO2");
                     reject(err);
                 });
             }));
@@ -108,20 +105,27 @@ class HomeController implements IControllerBase {
     }
 
     deleteEntity = (req: Request, res: Response) => {
-        let userRepo = new UserRepository();
         let entityRepo = new EntityRepository();
         
+        let id = req.body.id;
+
         let entity = new Entity();
-        entity.id = 14;
+        entity.id = id;
 
         entityRepo.deleteParticipants(14).then(() => {
             entityRepo.delete(entity).then(() => {
-                res.send("deleted succesfuly");
+                console.log("heyy");
+                res.status(200);
+                res.send();
             }).catch((err) => {
                 console.log(err);
+                res.status(404);
+                res.send({"error" : "Can not delete this check"});
             });
         }).catch((err) => {
             console.log(err);
+            res.status(404);
+            res.send({"error" : "Can not delete this check"});
             });
     }
 
