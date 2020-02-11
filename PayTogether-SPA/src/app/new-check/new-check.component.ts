@@ -9,6 +9,7 @@ import { User } from '../_models/User';
 })
 export class NewCheckComponent implements OnInit {
 
+  model: any = {};
   friends: any;
   constructor(private friendService: FriendService, public loggedUser: User) { }
 
@@ -20,5 +21,7 @@ export class NewCheckComponent implements OnInit {
       console.log(err);
     })
   }
-
+  submitData(){
+console.log(this.model);
+  }
 }

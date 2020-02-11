@@ -1,33 +1,38 @@
 <div class="container">
   <br />
-  <p>
-    Please provide us with details on your investment strategy:
-  </p>
   <form>
     <div class="container">
       <div class="form-group">
         <label>Name:</label>
-        <input type="text" class="form-control" />
+        <input type="text" class="form-control" name="name" [(ngModel)]="model.name"/>
       </div>
       <div class="form-group">
         <label>Amount:</label>
-        <input type="text" class="form-control" />
+        <input type="number" class="form-control" name="modey" [(ngModel)]="model.money"/>
       </div>
       <div class="form-group">
         <label>Owe or Recieve?</label><br />
-        <input type="radio" value="-" name="recieveorowe" id="owe" />
-        <label for="owe">Owe</label><br />
-        <input type="radio" value="+" name="recieveorowe" id="recieve" />
-        <label for="receive">Recieve</label><br />
+        <div class="row">
+          <div class="col">
+            <input type="radio" value="false" name="recieveorowe" id="owe" [(ngModel)]="model.income"/>
+            <label for="owe">Owe</label>
+          </div>
+          <div class="col">
+            <input type="radio" value="true" name="recieveorowe" id="recieve" [(ngModel)]="model.income" />
+            <label for="receive">Recieve</label><br />
+          </div>
+          <div class="col"></div>
+          <div class="col"></div>
+        </div>
       </div>
       <label>Pick a friend? </label>
       <select class="form-control">
-      <option *ngFor="let friend of friends" > {{friend['name_']}}</option>
+        <option *ngFor="let friend of friends" value="{{friend['id_']}}" name="friend" [(ngModel)]="model.friend"> {{friend['name_']}}</option>
       </select>
     </div>
 
     <div style="text-align: center;padding: 10pt;">
-      <button class="btn">
+      <button class="btn btn-dark" (click)="submitData()">
         Create
       </button>
     </div>
