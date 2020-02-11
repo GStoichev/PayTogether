@@ -26,4 +26,12 @@ export class CheckService {
     return this.http.delete(this.baseUrl + 'check', id);
   }
 
+  payCheck(check) {
+    return this.http.post(this.baseUrl + 'home/pay', check);
+  }
+
+  addToCheck(check){
+    return this.http.post(this.baseUrl + 'home/dept', check);
+  }
+
 }
