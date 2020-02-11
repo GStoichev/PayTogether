@@ -11,7 +11,7 @@ import { User } from '../_models/User';
 export class CheckListComponent implements OnInit {
 
   checks: any;
-  editModeFlag = false;
+  addAddInput = false;
 
   constructor(public loggedUser: User, private checkService: CheckService) {
   }
@@ -20,14 +20,16 @@ export class CheckListComponent implements OnInit {
     this.checkService.getChecks(this.loggedUser.ui).subscribe((checks) => {
       console.log('The checks: ', checks);
       this.checks = checks;
+      this.checks = this.checks.forEach(element => {
+
+      });
     }, error => {
       console.log(error);
     });
 
   }
 
-  editMode() {
-    this.editModeFlag = !this.editModeFlag;
-    console.log(this.editModeFlag);
+  addInput() {
+    this.addAddInput = !this.addAddInput;
   }
 }

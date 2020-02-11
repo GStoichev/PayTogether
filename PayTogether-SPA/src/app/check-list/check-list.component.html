@@ -2,12 +2,17 @@
   <div class="row">
     <div class="col-lg-2 col-mg-3 col-lg-6">
       <br>
+    <div>
+      <button class="btn btn-primary" routerLink='/new-check'>
+        New check
+      </button>
+    </div>
+      <br>
       <br>
       <div *ngFor="let check of checks">
 
 
 
-        <div *ngIf="!editModeFlag">
           <label>Name:</label> <b> {{ check["entity"]["name_"] }}</b>
           <br />
           <label>Description:</label> <b> {{ check["entity"]["desc_"] }}</b>
@@ -21,53 +26,22 @@
                   {{ (user["income"] ? "+" : "-") + user["money"] }}
                 </td>
                 <td>
-                  <button class="btn btn-warning">
-                    Edit
+                  <button class="btn btn-warning" (click)="addInput()">
+                    Add
                   </button>
                 </td>
                 <td>
+
                   <button class="btn btn-success">
                     {{user["income"] ? "Request" : "Pay"}}
                   </button>
                 </td>
-              </tr>
-            </table>
-          </div>
-        </div>
-
-        <div class="form-group" *ngIf="editModeFlag">
-          <label>Name:</label> <input type="text" class="form-control" value="{{check["entity"]["name_"]}}"/>
-          <br />
-          <label>Description:</label> <input type="text" class="form-control"
-            [value]="{{check["entity"]["desc_"]}}" />
-          <br />
-          <label>Participants:</label>
-          <div class="container">
-            <table cellspacing="0">
-              <tr *ngFor="let user of check['participants']">
-                <td style="width: 100px; font-size: large;"><i>{{ user["otherName"] }}</i></td>
-                <td style="width: 100px; font-size: large;">
-                  <input type="text" class="form-control" [value]="{{ (user["income"] ? "+" : "-") + user["money"] }}">
-                </td>
-                <td>
-                  <button class="btn btn-warning">
-                    Edit
-                  </button>
-                </td>
-                <td>
-                  <button class="btn btn-success">
-                    {{user["income"] ? "Request" : "Pay"}}
-                  </button>
+                 <td *ngIf="addAddInput">
+                  <input type="number">
                 </td>
               </tr>
             </table>
-          </div>
         </div>
-
-        <button class="btn btn-warning" (click)="editMode()">
-          Edit Check Properties
-        </button>
-
 
       </div>
     </div>

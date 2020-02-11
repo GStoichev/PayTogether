@@ -14,6 +14,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { FriendComponent } from './friend/friend.component';
 import { CheckListComponent } from './check-list/check-list.component';
 import { appRoutes } from './routes';
+import { NewCheckComponent } from './new-check/new-check.component';
 
 @NgModule({
    declarations: [
@@ -23,7 +24,8 @@ import { appRoutes } from './routes';
       HomeComponent,
       ProfileComponent,
       FriendComponent,
-      CheckListComponent
+      CheckListComponent,
+      NewCheckComponent
    ],
    imports: [
       BrowserModule,

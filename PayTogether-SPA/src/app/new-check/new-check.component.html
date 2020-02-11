@@ -1,0 +1,35 @@
+<div class="container">
+  <br />
+  <p>
+    Please provide us with details on your investment strategy:
+  </p>
+  <form>
+    <div class="container">
+      <div class="form-group">
+        <label>Name:</label>
+        <input type="text" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>Amount:</label>
+        <input type="text" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label>Owe or Recieve?</label><br />
+        <input type="radio" value="-" name="recieveorowe" id="owe" />
+        <label for="owe">Owe</label><br />
+        <input type="radio" value="+" name="recieveorowe" id="recieve" />
+        <label for="receive">Recieve</label><br />
+      </div>
+      <label>Pick a friend? </label>
+      <select class="form-control">
+      <option *ngFor="let friend of friends" > {{friend['name_']}}</option>
+      </select>
+    </div>
+
+    <div style="text-align: center;padding: 10pt;">
+      <button class="btn">
+        Create
+      </button>
+    </div>
+  </form>
+</div>
