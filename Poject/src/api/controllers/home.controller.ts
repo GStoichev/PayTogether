@@ -78,28 +78,38 @@ class HomeController implements IControllerBase {
     }
 
     pay = (req: Request, res: Response) => {
-        let userRepo = new UserRepository();
+        console.log(JSON.stringify(req.body));
+        let entity_id = req.body.entity_id;
+        let friend1_id = req.body.friend_id1;
+        let friend2_id = req.body.friend_id2;
+        let value = req.body.value;
+
         let entityRepo = new EntityRepository();
         
-        entityRepo.updatePayValue(14,"59f1ce52-322e-4df1-aaaf-f16758d35ff4","9f92828a-7493-4f40-8c22-e7c778c0ce32",10).then(() => {
-            
+        entityRepo.updatePayValue(entity_id, friend1_id, friend2_id, value).then(() => {
+            res.status(200);
             res.send();
         }).catch((err) => {
+            res.status(404);
+            res.send({ "error" : "Action failed"});
             console.log(`${err}`);
         });
-        
-        //user
-        //value_money
-        //entity
     }
 
     addMoreDept = (req: Request, res: Response) => {
-        let userRepo = new UserRepository();
+        let entity_id = req.body.entity_id;
+        let friend1_id = req.body.friend_id1;
+        let friend2_id = req.body.friend_id2;
+        let value = req.body.value;
+
         let entityRepo = new EntityRepository();
         
-        entityRepo.updateDeptValue(14,"59f1ce52-322e-4df1-aaaf-f16758d35ff4","9f92828a-7493-4f40-8c22-e7c778c0ce32",10).then(() => {         
-            res.send("updated succes");
+        entityRepo.updateDeptValue(entity_id,friend1_id,friend2_id,value).then(() => {         
+            res.status(200);
+            res.send();
         }).catch((err) => {
+            res.status(404);
+            res.send({ "error" : "Action failed"});
             console.log(`${err}`);
         });
     }
@@ -165,6 +175,7 @@ class HomeController implements IControllerBase {
                                 userRepo.readById(otherId).then((otherUser) => {
                                     let participantForPreview: ParticipantsForPreview = {
                                         myName: userName,
+                                        otherId: otherUser.id,
                                         otherName: otherUser.name,
                                         money: participant.money,
                                         income: income

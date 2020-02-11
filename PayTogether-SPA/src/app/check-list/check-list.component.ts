@@ -34,8 +34,10 @@ export class CheckListComponent implements OnInit {
     // console.log(this.model['newValue' + i + '_' + j]);
     this.model.value = this.model['newValue' + i + '_' + j];
     this.model.entity_id = entity_id;
-    this.model.friend_id1 = income === 'false' ? this.loggedUser.ui.id_ : friend_id;
-    this.model.friend_id2 = income === 'true' ? friend_id : this.loggedUser.ui.id_;
+    console.log(income);
+    this.model.friend_id1 = (income) ? friend_id : this.loggedUser.ui.id_;
+    this.model.friend_id2 = (income) ? this.loggedUser.ui.id_ : friend_id;
+    console.log(JSON.stringify(this.model));
     if(param===1){
     this.checkService.addToCheck(this.model).subscribe(() => {
       console.log('success');

@@ -213,7 +213,6 @@ export class EntityRepository implements IReposotory<Entity,number> {
     public updatePayValue(entityId: number, fr_1_id: string, fr_2_id: string, paidAmount: number) {
         let query = `SELECT * from ${this.participantsTableName} WHERE entity_id="${entityId}" AND friend_1_id="${fr_1_id}" AND friend_2_id="${fr_2_id}"`;
         return new Promise((resolve, reject) => {
-            
             new Promise((resolve,reject) =>  {     
                 this.db.get(query,(err, row) => {
                     if(err) {
@@ -222,7 +221,7 @@ export class EntityRepository implements IReposotory<Entity,number> {
                     }
         
                     if(!row) {
-                        reject("entity not found")
+                        reject("entity not found");
                         return;
                     }
         

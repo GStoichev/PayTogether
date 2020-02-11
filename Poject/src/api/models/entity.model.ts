@@ -11,6 +11,7 @@ export interface Participant {
 
 export interface ParticipantsForPreview {
     myName: string,
+    otherId: string,
     otherName: string,
     money: number,
     income: boolean

@@ -24,11 +24,11 @@
                 <td style="width: 130px;align-items: center;">
                   <input type="number" min="0" class="form-control" name="newValue{{i}}_{{j}}"
                     [(ngModel)]="model['newValue' + i + '_'+ j]">
-                  <button class="btn btn-secondary mr-2" (click)="addNewValue(i,j,check['entity']['id_'],user['id_'],user['income'],1)">
+                  <button class="btn btn-secondary mr-2" (click)="addNewValue(i,j,check['entity']['id_'],user['otherId'],user['income'],1)">
                     Add
                   </button>
 
-                  <button class="btn btn-success" (click)="addNewValue(i,j,check['entity']['id_'],user['id_'],user['income'],2)">
+                  <button class="btn btn-success" (click)="addNewValue(i,j,check['entity']['id_'],user['otherId'],user['income'],2)">
                     Pay
                   </button>
                 </td>
