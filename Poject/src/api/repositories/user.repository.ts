@@ -44,7 +44,7 @@ export class UserRepository implements IReposotory<User,string> {
                throw err;
             }
                 if(row === undefined) {
-                    return [];
+                    return null;
                 }
                 let id = row.id;
                 let name = row.name;
@@ -189,8 +189,14 @@ export class UserRepository implements IReposotory<User,string> {
     public addFriend(id: string, other_id: string): Promise<User> {
         let tableName = "friends";
         return new Promise((resolve, reject) => {
-            this.readById(id).then((user) => {
+            this.readById(id).then((userOne) => {
+                if(!userOne) {
+                    reject("user dosn't exist");
+                }
                 this.readById(other_id).then((user) => {
+                    if(!user) {
+                        reject("user dosn't exist");
+                    }
                     this.areWeFriends(id, other_id).then((areWeFriends) => {
                         if(areWeFriends) {
                             reject("We are already friends");

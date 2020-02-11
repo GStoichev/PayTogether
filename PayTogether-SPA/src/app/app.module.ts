@@ -10,6 +10,8 @@ import { NavComponent } from './nav/nav.component';
 import { AuthService } from './_services/auth.service';
 import { RegisterComponent } from './register/register.component';
 import { HomeComponent } from './home/home.component';
+import { ProfileComponent } from './profile/profile.component';
+import { FriendComponent } from './friend/friend.component';
 import { CheckListComponent } from './check-list/check-list.component';
 import { appRoutes } from './routes';
 
@@ -19,6 +21,8 @@ import { appRoutes } from './routes';
       NavComponent,
       RegisterComponent,
       HomeComponent,
+      ProfileComponent,
+      FriendComponent,
       CheckListComponent
    ],
    imports: [

@@ -6,6 +6,12 @@
       <li class="nav-item active" routerLinkActive="active" >
         <a class="nav-link"[routerLink]="['/check-list']" routerLinkActive="router-link-active" >List with checks </a>
       </li>
+      <li class="nav-item active" routerLinkActive="active" >
+        <a class="nav-link"[routerLink]="['/friend']" routerLinkActive="router-link-active" >Friends </a>
+      </li>
+      <li class="nav-item active" routerLinkActive="active" >
+        <a class="nav-link"[routerLink]="['/profile']" routerLinkActive="router-link-active" >Profile </a>
+      </li>
       <li class="nav-item active">
         <a class="nav-link" (click)="logOut()" *ngIf="loggedIn()">Log out</a>
       </li>

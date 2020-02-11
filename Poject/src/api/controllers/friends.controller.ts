@@ -6,7 +6,7 @@ import uuid from 'uuid/v4';
 import { UserRepository } from '../repositories/user.repository';
 
 class FriendsController implements IControllerBase {
-    public path = '/friends';
+    public path = '/friend';
     public router = express.Router();
 
     constructor() {
@@ -14,37 +14,44 @@ class FriendsController implements IControllerBase {
     }
 
     public initRoutes() {
-        this.router.get(this.path + `/:id`, this.showAllFriends);
+        this.router.post(this.path + `/friends`, this.showAllFriends);
+        //this.router.post(this.path + `/:id`, this.getFriend);
         this.router.post(this.path + `/add`, this.addFriend);
     }
 
     showAllFriends = (req: Request, res: Response) => {
-        let id = req.params.id;
+        console.log(JSON.stringify(req.body));
+        let id = req.body.id_;
         let userRepo = new UserRepository();
         
         userRepo.getAllFriends(id).then((friends) => {
-            console.log(friends.length);
-            res.render('user/friends', {friends: friends, err: "" , userId: id});
+            res.status(200);
+            res.send(JSON.parse(JSON.stringify(friends)))
+
         }).catch((err) => {
-            res.render('user/friends', {friends: [], err: err, userId: id});
-            //res.render("user/user", {err: err});
+            console.log(err);
+            res.status(404)
+            res.send({ "error" : "You don't have any friends" });
         });
     }
 
     addFriend = (req: Request, res: Response) => {
-        let id = req.body.id;
-        let otherId = req.body.other_id;
-        console.log(`id ${id} | otherId ${otherId}`);
+        let id = req.body.user.id_;
+        let otherId = req.body.id;
+        
         let userRepo = new UserRepository();
 
         userRepo.addFriend(id, otherId).then((friend) => {
             if(friend) {
-                res.send({new_friend: friend});
+                res.status(200);
+                res.send(JSON.parse(JSON.stringify(friend)));
             } else{
                 console.log("Should not happen");
+                res.status(404);
                 res.send();
             }
         }).catch((err) => {
+            res.status(404);
             res.send(err);
         });
 
